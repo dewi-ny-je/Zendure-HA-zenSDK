@@ -105,7 +105,7 @@ input_number:
     name: Zendure 2400 AC Max. Oplaadvermogen
     icon: mdi:format-vertical-align-top
     min: 400
-    max: 7200
+    max: 12000
     step: 1
     mode: box
     unit_of_measurement: "W"
@@ -114,7 +114,7 @@ input_number:
     name: Zendure 2400 AC Max. Ontlaadvermogen
     icon: mdi:format-vertical-align-bottom
     min: 400
-    max: 7200
+    max: 12000
     step: 1
     mode: box
     unit_of_measurement: "W"
@@ -167,8 +167,8 @@ input_number:
   zendure_2400_ac_handmatig_vermogen:
     name: Zendure 2400 AC Handmatig Vermogen
     icon: mdi:flash
-    min: -7200
-    max: 7200
+    min: -12000
+    max: 12000
     step: 1
     mode: box
     unit_of_measurement: "W"
@@ -365,7 +365,7 @@ template:
       - name: "Zendure 2400 AC Configuratie Versie"
         unique_id: Zendure_2400_AC_Configuratie_Versie
         icon: mdi:one-up
-        state: "v20260529"
+        state: "v20260617"
 
       - name: "Zendure 2400 AC Laatste Kalibratie (Dagen)"
         unique_id: Zendure_2400_AC_Laatste_Kalibratie_Dagen
@@ -1758,6 +1758,7 @@ rest:
             {% set mapping = {
               5: 2.88,
               70: 1.92,
+              250: 0.96,
               300: 1.92,
               350: 2.88,
               500: 2.40
@@ -2136,6 +2137,15 @@ rest:
             {% endif %}
           {% endif %}
         unique_id: Zendure_2400_AC_Vermogen_Aansturing
+        icon: >
+          {% set power = states('sensor.zendure_2400_ac_vermogen_aansturing') | float(0) %}
+          {% if power > 0 %}
+            mdi:battery-plus-variant
+          {% elif power < 0 %}
+            mdi:battery-minus-variant
+          {% else %}
+            mdi:battery-outline
+          {% endif %}
         unit_of_measurement: "W"
         state_class: measurement
         device_class: power

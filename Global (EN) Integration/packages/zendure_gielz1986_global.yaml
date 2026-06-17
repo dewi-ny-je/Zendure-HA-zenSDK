@@ -105,7 +105,7 @@ input_number:
     name: Zendure Maximum Charge Power
     icon: mdi:format-vertical-align-top
     min: 400
-    max: 7200
+    max: 12000
     step: 1
     mode: box
     unit_of_measurement: "W"
@@ -114,7 +114,7 @@ input_number:
     name: Zendure Maximum Discharge Power
     icon: mdi:format-vertical-align-bottom
     min: 400
-    max: 7200
+    max: 12000
     step: 1
     mode: box
     unit_of_measurement: "W"
@@ -167,8 +167,8 @@ input_number:
   zendure_manual_power:
     name: Zendure Manual Power
     icon: mdi:flash
-    min: -7200
-    max: 7200
+    min: -12000
+    max: 12000
     step: 1
     mode: box
     unit_of_measurement: "W"
@@ -365,7 +365,7 @@ template:
       - name: "Zendure Configuration Version"
         unique_id: zendure_configuration_version
         icon: mdi:one-up
-        state: "v20260529"
+        state: "v20260617"
 
       - name: "Zendure Last Calibration (Days)"
         unique_id: zendure_last_calibration_days
@@ -1760,6 +1760,7 @@ rest:
               5: 2.88,
               70: 1.92,
               300: 1.92,
+              250: 0.96,
               350: 2.88,
               500: 2.40
             } %}
@@ -2137,6 +2138,15 @@ rest:
             {% endif %}
           {% endif %}
         unique_id: zendure_power
+        icon: >
+          {% set power = states('sensor.zendure_power') | float(0) %}
+          {% if power > 0 %}
+            mdi:battery-plus-variant
+          {% elif power < 0 %}
+            mdi:battery-minus-variant
+          {% else %}
+            mdi:battery-outline
+          {% endif %}
         unit_of_measurement: "W"
         state_class: measurement
         device_class: power
@@ -2290,11 +2300,11 @@ rest:
         state_class: measurement
         device_class: power
 
-####### BEGIN - Plaats hier je Node-RED sensoren tussen van https://github.com/gast777/Zendure-zenSDK-proxy - BEGIN #######
+####### START - Place here your Node-RED sensors from https://github.com/gast777/Zendure-zenSDK-proxy - START #######
 
 
 
-####### EIND - Plaats hier je Node-RED sensoren tussen van https://github.com/gast777/Zendure-zenSDK-proxy - EIND ####### 
+####### END - Place here your Node-RED sensors from https://github.com/gast777/Zendure-zenSDK-proxy - END #######
 
   - resource_template: "http://{{ states('input_text.homewizard_setting_p1_ip_address') }}/api/v1/data"
     scan_interval: 1
