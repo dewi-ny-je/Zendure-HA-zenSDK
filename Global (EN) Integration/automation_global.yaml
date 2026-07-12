@@ -1,5 +1,5 @@
 alias: Zendure zenSDK (Gielz) Global
-description: Configuration Version (v20260620)
+description: Configuration Version (v20260712)
 triggers:
   - seconds: /5
     id: aansturing_trigger
@@ -154,6 +154,18 @@ actions:
             data:
               sn: "{{ states('sensor.zendure_serial_number') }}"
         alias: Dynamic Trading
+      - conditions:
+          - condition: trigger
+            id: modus_trigger
+          - condition: state
+            entity_id: input_select.zendure_operation_mode
+            state:
+              - Dynamic Trading + Smart Matching
+        sequence:
+          - action: rest_command.zendure_stop_with_everything
+            data:
+              sn: "{{ states('sensor.zendure_serial_number') }}"
+        alias: Dynamic Trading + Smart Matching
       - conditions:
           - condition: trigger
             id: modus_trigger
@@ -316,6 +328,10 @@ actions:
                 entity_id: input_select.zendure_operation_mode
                 state:
                   - Dynamic Smart Matching (Expensive)
+              - condition: state
+                entity_id: input_select.zendure_operation_mode
+                state:
+                  - Dynamic Trading + Smart Matching
           - condition: or
             conditions:
               - condition: sun
@@ -833,6 +849,37 @@ actions:
               entity_id: input_select.zendure_operation_mode
               name: " "
         alias: adjust PV export
+      - conditions:
+          - condition: state
+            entity_id: sensor.zendure_offgrid_mode
+            state:
+              - Eco
+              - Normal
+          - condition: numeric_state
+            entity_id: sensor.zendure_power_offgrid_outlet_1
+            above: 0
+          - condition: state
+            entity_id: sensor.zendure_storage_mode
+            state:
+              - RAM Memory
+          - condition: template
+            value_template: |-
+              {{ states('sensor.zendure_power_offgrid_outlet_1') | float(0) ==
+                 (states('sensor.zendure_power') | float(0) | abs) }}
+          - condition: state
+            entity_id: sensor.zendure_charging_mode
+            state:
+              - Discharging
+        sequence:
+          - action: rest_command.zendure_full_standby
+            data:
+              sn: "{{ states('sensor.zendure_serial_number') }}"
+          - action: logbook.log
+            data:
+              message: ⚠️Activate AC passthrough for offgrid —
+              entity_id: input_select.zendure_operation_mode
+              name: " "
+        alias: Activate AC passthrough for offgrid
   - alias: Smart Matching Control
     choose:
       - conditions:
@@ -1584,7 +1631,7 @@ actions:
                 trigger: template
                 value_template: >
                   {{ states('sensor.zendure_total_state_of_charge') | float(0)
-                  ==
+                  >=
                      states('sensor.zendure_maximum_state_of_charge') | float(0) }}
                 for:
                   hours: 0
@@ -1600,6 +1647,11 @@ actions:
                 entity_id:
                   - sensor.dynamic_spread_indication_dsc
             continue_on_timeout: false
+          - action: input_boolean.turn_off
+            target:
+              entity_id:
+                - input_boolean.dynamic_charging_running
+            data: {}
           - action: rest_command.zendure_stop_with_everything
             data:
               sn: "{{ states('sensor.zendure_serial_number') }}"
@@ -1607,11 +1659,6 @@ actions:
             data: {}
             target:
               entity_id: input_boolean.dynamic_recently_charged
-          - action: input_boolean.turn_off
-            target:
-              entity_id:
-                - input_boolean.dynamic_charging_running
-            data: {}
           - action: logbook.log
             data:
               message: 💲Dynamic Smart Matching cheap charging complete   —
@@ -1703,7 +1750,7 @@ actions:
                 trigger: template
                 value_template: >
                   {{ states('sensor.zendure_total_state_of_charge') | float(0)
-                  ==
+                  >=
                      states('sensor.zendure_maximum_state_of_charge') | float(0) }}
                 for:
                   hours: 0
@@ -1719,6 +1766,11 @@ actions:
                 entity_id:
                   - sensor.dynamic_spread_indication
             continue_on_timeout: false
+          - action: input_boolean.turn_off
+            target:
+              entity_id:
+                - input_boolean.dynamic_charging_running
+            data: {}
           - action: rest_command.zendure_stop_with_everything
             data:
               sn: "{{ states('sensor.zendure_serial_number') }}"
@@ -1726,11 +1778,6 @@ actions:
             data: {}
             target:
               entity_id: input_boolean.dynamic_recently_charged
-          - action: input_boolean.turn_off
-            target:
-              entity_id:
-                - input_boolean.dynamic_charging_running
-            data: {}
           - action: logbook.log
             data:
               message: 💲Dynamic cheap charging complete  —
@@ -1833,14 +1880,14 @@ actions:
                 entity_id:
                   - sensor.dynamic_spread_indication
             continue_on_timeout: false
-          - action: rest_command.zendure_stop_with_everything
-            data:
-              sn: "{{ states('sensor.zendure_serial_number') }}"
           - action: input_boolean.turn_off
             target:
               entity_id:
                 - input_boolean.dynamic_discharging_running
             data: {}
+          - action: rest_command.zendure_stop_with_everything
+            data:
+              sn: "{{ states('sensor.zendure_serial_number') }}"
           - action: logbook.log
             data:
               message: 💲Dynamic expensive discharge complete  —
