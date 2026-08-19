@@ -469,15 +469,33 @@ template:
         state: >-
           {% set ingevuld = states('input_text.dynamisch_nordpool_sensor') %}
           {% if ingevuld | lower | regex_match('^sensor\\..+') and states(ingevuld) not in ['unknown', 'unavailable', 'none'] %}
-            {% set nordpool = ingevuld %}
+            {% set bron = ingevuld %}
           {% else %}
-            {% set nordpool = none %}
+            {% set bron = none %}
           {% endif %}
 
-          {% if nordpool is not none %}
+          {% if bron is not none %}
             {% set use_15_min = is_state('input_boolean.dynamisch_15_minuten', 'on') %}
+            {# Nordpool levert raw_today (start/end/value). Frank Energie levert prices (from/till/price) voor meerdere dagen. #}
+            {% set raw = state_attr(bron, 'raw_today') %}
+            {% if raw is string or raw is not iterable %}
+              {% set dag = today_at('00:00') %}
+              {% set bron_prijzen = state_attr(bron, 'prices') or state_attr(bron, 'prices_today') or [] %}
+              {% set ns = namespace(items=[]) %}
+              {% for p in bron_prijzen %}
+                {% set s = as_datetime(p['from']) %}
+                {% if s is not none %}
+                  {% set s = as_local(s) %}
+                  {% if s >= dag and s < dag + timedelta(days=1) %}
+                    {% set ns.items = ns.items + [{'start': s, 'end': as_local(as_datetime(p['till'])), 'value': p['price'] | float(0)}] %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              {% set raw = ns.items | sort(attribute='start') %}
+            {% endif %}
+
             {% if use_15_min %}
-              {% set data = state_attr(nordpool, 'raw_today') or [] %}
+              {% set data = raw or [] %}
               {% set nowts = as_timestamp(now()) %}
               {% set current = namespace(val=None) %}
               {% for p in data %}
@@ -489,7 +507,6 @@ template:
               {% endfor %}
               {{ current.val if current.val is not none else 'unknown' }}
             {% else %}
-              {% set raw = state_attr(nordpool, 'raw_today') %}
               {% set nu = now() %}
               {% if raw %}
                 {% set current_hour_values = raw 
@@ -500,10 +517,10 @@ template:
                 {% if current_hour_values %}
                   {{ (current_hour_values | sum / current_hour_values | count) | round(5) }}
                 {% else %}
-                  {{ states(nordpool) }}
+                  {{ states(bron) }}
                 {% endif %}
               {% else %}
-                {{ states(nordpool) }}
+                {{ states(bron) }}
               {% endif %}
             {% endif %}
           {% else %}
@@ -513,14 +530,31 @@ template:
           raw_today: >-
             {% set ingevuld = states('input_text.dynamisch_nordpool_sensor') %}
             {% if ingevuld | lower | regex_match('^sensor\\..+') and states(ingevuld) not in ['unknown', 'unavailable', 'none'] %}
-              {% set nordpool = ingevuld %}
+              {% set bron = ingevuld %}
             {% else %}
-              {% set nordpool = none %}
+              {% set bron = none %}
             {% endif %}
 
-            {% if nordpool is not none %}
+            {% if bron is not none %}
               {% set use_15_min = is_state('input_boolean.dynamisch_15_minuten', 'on') %}
-              {% set raw = state_attr(nordpool, 'raw_today') %}
+              {# Nordpool levert raw_today (start/end/value). Frank Energie levert prices (from/till/price) voor meerdere dagen. #}
+              {% set raw = state_attr(bron, 'raw_today') %}
+              {% if raw is string or raw is not iterable %}
+                {% set dag = today_at('00:00') %}
+                {% set bron_prijzen = state_attr(bron, 'prices') or state_attr(bron, 'prices_today') or [] %}
+                {% set ns = namespace(items=[]) %}
+                {% for p in bron_prijzen %}
+                  {% set s = as_datetime(p['from']) %}
+                  {% if s is not none %}
+                    {% set s = as_local(s) %}
+                    {% if s >= dag and s < dag + timedelta(days=1) %}
+                      {% set ns.items = ns.items + [{'start': s, 'end': as_local(as_datetime(p['till'])), 'value': p['price'] | float(0)}] %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+                {% set raw = ns.items | sort(attribute='start') %}
+              {% endif %}
+
               {% if raw %}
                 [
                 {% if use_15_min %}
@@ -554,14 +588,31 @@ template:
           raw_tomorrow: >-
             {% set ingevuld = states('input_text.dynamisch_nordpool_sensor') %}
             {% if ingevuld | lower | regex_match('^sensor\\..+') and states(ingevuld) not in ['unknown', 'unavailable', 'none'] %}
-              {% set nordpool = ingevuld %}
+              {% set bron = ingevuld %}
             {% else %}
-              {% set nordpool = none %}
+              {% set bron = none %}
             {% endif %}
 
-            {% if nordpool is not none %}
+            {% if bron is not none %}
               {% set use_15_min = is_state('input_boolean.dynamisch_15_minuten', 'on') %}
-              {% set raw = state_attr(nordpool, 'raw_tomorrow') %}
+              {# Nordpool levert raw_tomorrow (start/end/value). Frank Energie levert prices (from/till/price) voor meerdere dagen. #}
+              {% set raw = state_attr(bron, 'raw_tomorrow') %}
+              {% if raw is string or raw is not iterable %}
+                {% set dag = today_at('00:00') + timedelta(days=1) %}
+                {% set bron_prijzen = state_attr(bron, 'prices') or state_attr(bron, 'prices_tomorrow') or [] %}
+                {% set ns = namespace(items=[]) %}
+                {% for p in bron_prijzen %}
+                  {% set s = as_datetime(p['from']) %}
+                  {% if s is not none %}
+                    {% set s = as_local(s) %}
+                    {% if s >= dag and s < dag + timedelta(days=1) %}
+                      {% set ns.items = ns.items + [{'start': s, 'end': as_local(as_datetime(p['till'])), 'value': p['price'] | float(0)}] %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+                {% set raw = ns.items | sort(attribute='start') %}
+              {% endif %}
+
               {% if raw %}
                 [
                 {% if use_15_min %}
