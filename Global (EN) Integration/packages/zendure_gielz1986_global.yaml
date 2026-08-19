@@ -2333,7 +2333,17 @@ rest:
     scan_interval: 1
     sensor:
       - name: "Homewizard P1 Power"
-        value_template: "{{ value_json.active_power_w | float }}"
+        # The P1 meter is optional: when no IP-address is filled in, or the
+        # meter is unreachable, the REST call returns no JSON and value_json
+        # does not exist. Guard the template so it reports "unavailable"
+        # instead of logging a template error on every poll.
+        availability: "{{ value_json is defined and value_json.active_power_w is defined }}"
+        value_template: >
+          {% if value_json is defined and value_json.active_power_w is defined %}
+            {{ value_json.active_power_w | float(0) }}
+          {% else %}
+            {{ None }}
+          {% endif %}
         unique_id: homewizard_p1_power
         unit_of_measurement: "W"
         device_class: power
