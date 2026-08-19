@@ -87,7 +87,7 @@ homeassistant:
 | `home_energy_setting_meter_sensor` | **e.g. sensor.custom_energy** – Add your own home energy sensor (+watt import / -watt export). This will take priority. [Go to WIKI](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-and-NL-%E2%80%90-P1-CT-meters-(API's))) for P1/CT API's. |
 | `zendure_setting_battery_order` | **e.g. 1;5;3;4;2** – Manually define battery order based on serial numbers and physical stacking. |
 | **Configuration (Dynamic)** | **Information** |
-| `dynamic_setting_nordpool_sensor` | **e.g. sensor.nordpool_kwh_nl_eur_3_09_0** – Your Nordpool (HACS) sensor. |
+| `dynamic_setting_nordpool_sensor` | **e.g. sensor.nordpool_kwh_nl_eur_3_09_0** – Your Nordpool (HACS) sensor. A Frank Energie price sensor (the one with the `prices` attribute, e.g. **sensor.current_electricity_price**) is also supported; its 15-minute prices are used as-is, or averaged per hour when `dynamic_setting_15_minute_interval` is off. |
 | `dynamic_export_correction` | Specify how many cents should be subtracted during export. This value is used in the spread calculation. |
 | `dynamic_setting_minimal_spread` | **e.g. 25%** – Minimum price spread before dynamic charging/discharging activates. |
 | `dynamic_setting_15_minute_interval` | Enable this if you want to use 15-minute intervals. |
