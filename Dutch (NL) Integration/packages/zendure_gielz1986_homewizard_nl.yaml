@@ -1,0 +1,38 @@
+####################################################################################
+# Zendure zenSDK van Gielz1986 - OPTIONEEL Homewizard P1 package (NL)
+#
+# Plaats dit bestand ALLEEN als je een Homewizard P1 hebt en het veld
+# "Homewizard P1 IP-adres" (input_text.homewizard_p1_ip_adres) op het
+# instellingendashboard hebt ingevuld. Zet het in dezelfde Home Assistant
+# packages map als zendure_gielz1986_nl.yaml.
+#
+# Waarom een apart bestand?
+# De RESTful-integratie bevraagt de resource elke seconde, ongeacht wat de
+# template oplevert. Zonder (of met een nog niet herstelde) IP-adres wordt dat
+# "http:///api/v1/data" of "http://unknown/api/v1/data" en logt Home Assistant
+# elke seconde "Error fetching data: ... failed with ...". Wie een andere
+# P1/CT-meter gebruikt, plaatst dit bestand simpelweg niet.
+#
+# Het hoofdpackage hoeft niet aangepast te worden: de sensor "P1 Aansturing
+# Vermogen" gebruikt bij voorkeur input_text.afwijkende_p1_sensor en behandelt
+# een ontbrekende sensor.homewizard_p1_vermogen als "niet aanwezig".
+####################################################################################
+
+rest:
+  - resource_template: "http://{{ states('input_text.homewizard_p1_ip_adres') }}/api/v1/data"
+    scan_interval: 1
+    sensor:
+      - name: "Homewizard P1 Vermogen"
+        # Bescherming tegen een tijdelijk onbereikbare meter: zonder deze
+        # controle geeft de template bij elke mislukte poll de fout
+        # "'value_json' is undefined".
+        availability: "{{ value_json is defined and value_json.active_power_w is defined }}"
+        value_template: >
+          {% if value_json is defined and value_json.active_power_w is defined %}
+            {{ value_json.active_power_w | float(0) }}
+          {% else %}
+            {{ None }}
+          {% endif %}
+        unique_id: Homewizard_P1_Vermogen
+        unit_of_measurement: "W"
+        device_class: power

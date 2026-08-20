@@ -1,0 +1,54 @@
+####################################################################################
+# Zendure zenSDK by Gielz1986 - home energy meter package
+# Homewizard P1 - local API v2
+#
+# Install ONLY the package file of the meter you actually own. The RESTful
+# integration polls the address every second, and every failed poll is written
+# to the log, so an address that does not answer floods home-assistant.log.
+#
+# How to use
+#   1. Copy this file into the same Home Assistant `packages` folder as
+#      zendure_gielz1986_global.yaml (EN) or zendure_gielz1986_nl.yaml (NL).
+#   2. Replace <IP-HOMEWIZARD-P1> below with the IP-address of your meter,
+#      and <TOKEN> with your authorization token (see the note below).
+#   3. Restart Home Assistant. The meter is then available as:
+#
+#        sensor.p1_homewizard_api_v2
+#
+#   4. Fill that entity in on the settings dashboard:
+#        Global (EN): Home Energy Meter Sensor  (input_text.home_energy_setting_meter_sensor)
+#        Dutch  (NL): Afwijkende P1 sensor      (input_text.afwijkende_p1_sensor)
+#      It then takes priority over the built-in Homewizard reading.
+#   5. Give the meter a fixed IP-address (DHCP reservation in your router), so
+#      the address in this file cannot change.
+#
+# Expected reading: +watt = import from the grid, -watt = export to the grid.
+#
+# API v2 needs an authorization token. Create one by following
+# https://api-documentation.homewizard.com/docs/v2/authorization
+# and replace <TOKEN> below. The meter serves the v2 API over HTTPS
+# with a self-signed certificate, hence verify_ssl: false.
+####################################################################################
+
+rest:
+  - resource: https://<IP-HOMEWIZARD-P1>/api/measurement
+    verify_ssl: false
+    headers:
+      Authorization: "Bearer <TOKEN>"
+    scan_interval: 1
+    sensor:
+      - name: "P1 Homewizard API v2"
+        unique_id: P1_Homewizard_API_V2
+        # Guard against a meter that is unreachable or still booting: without
+        # these checks the template raises "'value_json' is undefined" and the
+        # error is logged on every single poll.
+        availability: "{{ value_json is defined and value_json.power_w is defined }}"
+        value_template: >
+          {% if value_json is defined and value_json.power_w is defined %}
+            {{ value_json.power_w | float(0) }}
+          {% else %}
+            {{ None }}
+          {% endif %}
+        unit_of_measurement: "W"
+        device_class: power
+        state_class: measurement

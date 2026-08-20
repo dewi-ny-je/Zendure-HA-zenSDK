@@ -35,6 +35,8 @@ Trakteer mij op een kopje koffie ☕️ en volg deze GitHub repository ⭐⭐⭐
 
 1. Zorg ervoor dat **HEMS is uitgeschakeld** in de Zendure-app.
 2. Plaats [Zendure_gielz1986_nl.yaml](./Dutch%20(NL)%20Integration/packages/zendure_gielz1986_nl.yaml) uit de map packages van GitHub in de map packages van Home Assistant. Mocht de map packages niet bestaan maak deze dan aan.
+2b. **Alleen als je een Homewizard P1 hebt**: plaats ook [zendure_gielz1986_homewizard_nl.yaml](./Dutch%20(NL)%20Integration/packages/zendure_gielz1986_homewizard_nl.yaml) in diezelfde map packages. Dit bestand voegt `sensor.homewizard_p1_vermogen` toe. Gebruik je een andere P1/CT-meter (`afwijkende_p1_sensor`)? Sla dit bestand dan over - het bevraagt de P1 elke seconde en vult anders je log met `Error fetching data: http:///api/v1/data failed with ...`.
+2c. **Gebruik je een andere P1/CT-meter?** Pak het bijbehorende package bestand uit [Energy Meters (Global & NL)](./Energy%20Meters%20(Global%20&%20NL)/README.md) - Homewizard API v1/v2, Zendure P1, Ecotracker P1, Zendure CT of Shelly Pro 3EM - zet het in dezelfde map packages, vervang daarin het `<IP-...>` voorbeeld en vul de sensor die het aanmaakt in bij `afwijkende_p1_sensor` hieronder. Plaats alleen het bestand van de meter die je hebt.
 3. Maak nu een **backup** van je `configuration.yaml`.
 4. Pas daarna je `configuration.yaml` aan door de onderstaande regel toe te voegen.
 
@@ -63,7 +65,7 @@ homeassistant:
 |-|-|
 | **Configuratie (Basis)** | **Informatie**|  
 | `zendure_2400_ac_ip_adres`       | **bijvoorbeeld 192.168.0.172** – In de Zendure app onder device Information. |  
-| `homewizard_p1_ip_adres`    | **(Instellingsadvies: gebruik een Homewizard P1) bijvoorbeeld 192.168.0.192** – In de Homewizard app (lokale API aanzetten).  |  
+| `homewizard_p1_ip_adres`    | **(Instellingsadvies: gebruik een Homewizard P1) bijvoorbeeld 192.168.0.192** – In de Homewizard app (lokale API aanzetten). Vereist het optionele package bestand `zendure_gielz1986_homewizard_nl.yaml` (zie stap 2b).  |  
 | `zendure_2400_ac_standby_vertraging` | **(Instellingsadvies: 15 minuten) 5-30 minuten** – Geef hier aan hoe snel de omvormer 100% in standby gaat bij 0 activiteit. Dit voorkomt sluipverbruik van +/- 19 watt. | 
 | `zendure_2400_ac_advies_instellingen_overnemen` | Zodra de batterij draait kun je met deze knop de onderstaande instellingsadviezen direct overnemen. | 
 | **Configuratie (Opladen)** |**Informatie**|  
@@ -79,9 +81,9 @@ homeassistant:
 | `zendure_2400_ac_minimaal_toegestaan_laadpercentage` | **(Instellingsadvies: 10%) 5% t/m 50%** – Geef hier het minimaal toegestaan laadpercentage aan. | 
 | `zendure_2400_ac_maximaal_toegestaan_laadpercentage` | **(Instellingsadvies: 100%) 70% t/m 100%** – Geef hier het maximaal toegestaan laadpercentage aan. Bij 100% vind er een SOC kalibratie plaats om het laadpercentage goed te kunnen inschatten. | 
 | **Configuratie (PV)** |**Informatie**|  
-| `zendure_2400_ac_pv_export_uitgeschakeld` | Vink dit aan om PV export uit te schakelen. Als de batterij vol is zal er niet langer energie geexporteerd worden van de verbonden zonnepanelen. | 
+| `zendure_2400_ac_pv_export_uitgeschakeld` | Vink dit aan om PV export uit te schakelen. Als de batterij vol is zal er niet langer energie geëxporteerd worden van de verbonden zonnepanelen. | 
 | **Configuratie (Optioneel)** |**Informatie**|  
-| `afwijkende_p1_sensor` | **bijvoorbeeld `sensor.eigen_P1`** – je eigen afwijkende P1 sensor toevoegen waarbij +watt afname is en -watt teruglevering (vul je hier je eigen sensor in dan is deze altijd leidend). [Ga naar WIKI](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-and-NL-%E2%80%90-P1-CT-meters-(API's))) voor afwijkende P1/CT API's. |  
+| `afwijkende_p1_sensor` | **bijvoorbeeld `sensor.eigen_P1`** – je eigen afwijkende P1 sensor toevoegen waarbij +watt afname is en -watt teruglevering (vul je hier je eigen sensor in dan is deze altijd leidend). Kant-en-klare package bestanden voor de Homewizard (API v1/v2), Zendure P1, Ecotracker, Zendure CT en Shelly Pro 3EM meters staan in [Energy Meters (Global & NL)](./Energy%20Meters%20(Global%20&%20NL)/README.md), zie stap 2c. Of [ga naar de WIKI](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-and-NL-%E2%80%90-P1-CT-meters-(API's))) voor de losse P1/CT API's. |  
 | `zendure_2400_ac_batterij_volgorde` | **bijvoorbeeld 1;5;3;4;2** – hiermee bepaal je zelf een afwijkende volgorde van de batterijen. De juiste volgorde bepaal je mede aan de hand van `sensor.zendure_2400_ac_batterij_serienummers` en de sticker op de batterij(en). Op deze manier zullen de batterijtemperaturen en het laadpercentage de juiste volgorde hebben zoals die van de batterij(en) in de stapel. | 
 | **Configuratie (Dynamisch)** |**Informatie**|  
 | `dynamisch_nordpool_sensor` | **bijvoorbeeld `sensor.nordpool_kwh_nl_eur_3_09_0`** – je eigen sensor van Nordpool (HACS) toevoegen. Ook een prijssensor van Frank Energie wordt ondersteund (de sensor met het `prices` attribuut, bijvoorbeeld **sensor.current_electricity_price**); de kwartierprijzen worden dan direct gebruikt, of per uur gemiddeld wanneer `dynamisch_15_minuten` uit staat. Wanneer je het Dynamisch Nordpool gedeelte in gebruik gaat nemen moet je voor dat je deze in gebruik neemt bij `dynamisch_handmatige_periode` en `dynamisch_handmatige_periode_morgen` even **unknown** weghalen. Hierna zal het dynamisch gedeelte werken. Alles wat in de forecast (morgen) gezet word zal overgenomen worden om 00:00 via de automatisering en verschijnen in vandaag. |  
