@@ -2329,24 +2329,11 @@ rest:
 
 ####### END - Place here your Node-RED sensors from https://github.com/gast777/Zendure-zenSDK-proxy - END #######
 
-  - resource_template: "http://{{ states('input_text.homewizard_setting_p1_ip_address') }}/api/v1/data"
-    scan_interval: 1
-    sensor:
-      - name: "Homewizard P1 Power"
-        # The P1 meter is optional: when no IP-address is filled in, or the
-        # meter is unreachable, the REST call returns no JSON and value_json
-        # does not exist. Guard the template so it reports "unavailable"
-        # instead of logging a template error on every poll.
-        availability: "{{ value_json is defined and value_json.active_power_w is defined }}"
-        value_template: >
-          {% if value_json is defined and value_json.active_power_w is defined %}
-            {{ value_json.active_power_w | float(0) }}
-          {% else %}
-            {{ None }}
-          {% endif %}
-        unique_id: homewizard_p1_power
-        unit_of_measurement: "W"
-        device_class: power
+####### The optional Homewizard P1 sensor lives in its own package file:
+#######   zendure_gielz1986_homewizard_global.yaml
+####### Place that file next to this one in your packages folder ONLY if you
+####### own a Homewizard P1. Without it the RESTful integration would poll
+####### http:///api/v1/data every second and flood the log with errors.
 
 rest_command:
   zendure_save_in_ram:

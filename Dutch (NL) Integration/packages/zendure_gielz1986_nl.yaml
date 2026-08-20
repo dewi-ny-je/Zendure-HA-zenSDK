@@ -2328,24 +2328,11 @@ rest:
 
 ####### EIND - Plaats hier je Node-RED sensoren tussen van https://github.com/gast777/Zendure-zenSDK-proxy - EIND ####### 
 
-  - resource_template: "http://{{ states('input_text.homewizard_p1_ip_adres') }}/api/v1/data"
-    scan_interval: 1
-    sensor:
-      - name: "Homewizard P1 Vermogen"
-        # De P1-meter is optioneel: als er geen IP-adres is ingevuld, of de
-        # meter niet bereikbaar is, levert de REST-aanroep geen JSON op en
-        # bestaat value_json niet. Deze controle zorgt dat de sensor
-        # "unavailable" wordt in plaats van elke poll een templatefout te loggen.
-        availability: "{{ value_json is defined and value_json.active_power_w is defined }}"
-        value_template: >
-          {% if value_json is defined and value_json.active_power_w is defined %}
-            {{ value_json.active_power_w | float(0) }}
-          {% else %}
-            {{ None }}
-          {% endif %}
-        unique_id: Homewizard_P1_Vermogen
-        unit_of_measurement: "W"
-        device_class: power
+####### De optionele Homewizard P1 sensor staat in een eigen package bestand:
+#######   zendure_gielz1986_homewizard_nl.yaml
+####### Plaats dat bestand ALLEEN naast dit bestand in je packages map als je
+####### een Homewizard P1 hebt. Zonder dat bestand bevraagt de RESTful
+####### integratie elke seconde http:///api/v1/data en loopt je log vol.
 
 rest_command:
   zendure_opslaan_in_ram:
