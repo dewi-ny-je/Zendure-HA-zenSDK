@@ -39,6 +39,7 @@ Buy me a coffee ☕️ and follow this GitHub repository ⭐⭐⭐.
 1. Make sure **HEMS is disabled** in the Zendure app.
 2. Place [Zendure_gielz1986_global.yaml](./Global%20(EN)%20Integration/packages/zendure_gielz1986_global.yaml) from the GitHub packages folder into your Home Assistant `packages` folder. If it does not exist, create it.
 2b. **Only if you own a Homewizard P1**: also place [zendure_gielz1986_homewizard_global.yaml](./Global%20(EN)%20Integration/packages/zendure_gielz1986_homewizard_global.yaml) in that same `packages` folder. It adds `sensor.homewizard_p1_power`. Using a different home energy meter (`home_energy_setting_meter_sensor`)? Then skip this file - it polls the P1 every second and would otherwise fill your log with `Error fetching data: http:///api/v1/data failed with ...`.
+2c. **Using another P1/CT meter?** Take the matching package file from [Energy Meters (Global & NL)](./Energy%20Meters%20(Global%20&%20NL)/README.md) - Homewizard API v1/v2, Zendure P1, Ecotracker P1, Zendure CT or Shelly Pro 3EM - put it in the same `packages` folder, replace the `<IP-...>` placeholder in it and fill the sensor it creates in at `home_energy_setting_meter_sensor` below. Install only the file for the meter you own.
 3. Create a **backup** of your `configuration.yaml`.
 4. Then edit your `configuration.yaml` and add the following:
 
@@ -85,7 +86,7 @@ homeassistant:
 | **Configuration (PV)** |**Information**|  
 | `zendure_setting_pv_export_disabled`    | Check this to disable the pv export. When the battery is full it will no longer export the energy of connected solarpanels. | 
 | **Configuration (Optional)** | **Information** |
-| `home_energy_setting_meter_sensor` | **e.g. sensor.custom_energy** – Add your own home energy sensor (+watt import / -watt export). This will take priority. [Go to WIKI](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-and-NL-%E2%80%90-P1-CT-meters-(API's))) for P1/CT API's. |
+| `home_energy_setting_meter_sensor` | **e.g. sensor.custom_energy** – Add your own home energy sensor (+watt import / -watt export). This will take priority. Ready-made package files for the Homewizard (API v1/v2), Zendure P1, Ecotracker, Zendure CT and Shelly Pro 3EM meters are in [Energy Meters (Global & NL)](./Energy%20Meters%20(Global%20&%20NL)/README.md), see step 2c. Or [Go to WIKI](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-and-NL-%E2%80%90-P1-CT-meters-(API's))) for the raw P1/CT API's. |
 | `zendure_setting_battery_order` | **e.g. 1;5;3;4;2** – Manually define battery order based on serial numbers and physical stacking. |
 | **Configuration (Dynamic)** | **Information** |
 | `dynamic_setting_nordpool_sensor` | **e.g. sensor.nordpool_kwh_nl_eur_3_09_0** – Your Nordpool (HACS) sensor. |
