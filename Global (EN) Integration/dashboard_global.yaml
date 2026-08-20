@@ -2880,8 +2880,10 @@ views:
             content: >-
               <ha-alert alert-type="info">Help text</ha-alert>If you have a
               dynamic contract, you can enter this under **Dynamic Nordpool
-              Sensor⚙️**. For example **sensor.nordpool_kwh_nl_eur_3_09_0** and
-              this has te be from the Nordpool HACS integration.
+              Sensor⚙️**. For example **sensor.nordpool_kwh_nl_eur_3_09_0**
+              from the Nordpool HACS integration, or a Frank Energie price
+              sensor such as **sensor.current_electricity_price** (the sensor
+              with the **prices** attribute).
 
 
               Specify the minimum spread required to make use of charging and

@@ -2887,8 +2887,11 @@ views:
             content: >-
               <ha-alert alert-type="info">Helptekst</ha-alert>Heb je een
               dynamisch contract dan kun je hier de Nordpool HACS sensor
-              invullen en aangeven wat de minimale spread moet zijn om gebruik
-              te maken van het laden en ontladen op lage en hoge tarieven.
+              invullen, of een prijssensor van Frank Energie (de sensor met het
+              **prices** attribuut, bijvoorbeeld
+              **sensor.current_electricity_price**), en aangeven wat de
+              minimale spread moet zijn om gebruik te maken van het laden en
+              ontladen op lage en hoge tarieven.
 
 
               Heb je een 15 minuten contract vink dit dan aan zodat de grafieken
