@@ -1,0 +1,37 @@
+####################################################################################
+# Zendure zenSDK by Gielz1986 - OPTIONAL HomeWizard P1 package (Global / EN)
+#
+# Install this file ONLY if you own a HomeWizard P1 meter and have filled in
+# "Homewizard P1 IP-address" (input_text.homewizard_setting_p1_ip_address) on
+# the settings dashboard. Place it in the same Home Assistant packages folder
+# as zendure_gielz1986_global.yaml.
+#
+# Why is this a separate file?
+# The RESTful integration polls the resource every second, whatever the
+# template renders to. With an empty or not yet restored IP-address that is
+# "http:///api/v1/data" or "http://unknown/api/v1/data", so Home Assistant
+# logs "Error fetching data: ... failed with ..." once per second forever.
+# Users on a different home energy meter simply do not install this file.
+#
+# The main package needs no change: its "Home Energy Meter Power" sensor
+# prefers input_text.home_energy_setting_meter_sensor and treats a missing
+# sensor.homewizard_p1_power as "not present".
+####################################################################################
+
+rest:
+  - resource_template: "http://{{ states('input_text.homewizard_setting_p1_ip_address') }}/api/v1/data"
+    scan_interval: 1
+    sensor:
+      - name: "Homewizard P1 Power"
+        # Guard against a meter that is briefly unreachable: without this the
+        # template raises "'value_json' is undefined" on every failed poll.
+        availability: "{{ value_json is defined and value_json.active_power_w is defined }}"
+        value_template: >
+          {% if value_json is defined and value_json.active_power_w is defined %}
+            {{ value_json.active_power_w | float(0) }}
+          {% else %}
+            {{ None }}
+          {% endif %}
+        unique_id: homewizard_p1_power
+        unit_of_measurement: "W"
+        device_class: power

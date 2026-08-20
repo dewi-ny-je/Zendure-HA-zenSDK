@@ -38,6 +38,7 @@ Buy me a coffee ☕️ and follow this GitHub repository ⭐⭐⭐.
 
 1. Make sure **HEMS is disabled** in the Zendure app.
 2. Place [Zendure_gielz1986_global.yaml](./Global%20(EN)%20Integration/packages/zendure_gielz1986_global.yaml) from the GitHub packages folder into your Home Assistant `packages` folder. If it does not exist, create it.
+2b. **Only if you own a Homewizard P1**: also place [zendure_gielz1986_homewizard_global.yaml](./Global%20(EN)%20Integration/packages/zendure_gielz1986_homewizard_global.yaml) in that same `packages` folder. It adds `sensor.homewizard_p1_power`. Using a different home energy meter (`home_energy_setting_meter_sensor`)? Then skip this file - it polls the P1 every second and would otherwise fill your log with `Error fetching data: http:///api/v1/data failed with ...`.
 3. Create a **backup** of your `configuration.yaml`.
 4. Then edit your `configuration.yaml` and add the following:
 
@@ -66,7 +67,7 @@ homeassistant:
 |-|-|
 | **Configuration (Basic)** | **Information** |
 | `zendure_setting_ip_address` | **e.g. 192.168.0.172** – Found in the Zendure app under device information. |
-| `homewizard_setting_p1_ip_address` | **e.g. 192.168.0.192** – Enable local API in the Homewizard app |
+| `homewizard_setting_p1_ip_address` | **e.g. 192.168.0.192** – Enable local API in the Homewizard app. Requires the optional package file `zendure_gielz1986_homewizard_global.yaml` (see step 2b). |
 | `zendure_setting_standby_delay` | **(Recommended: 15 minutes) 5–30 minutes** – Defines how quickly the inverter goes into full standby at 0 activity. Prevents ~19W idle consumption. |
 | `zendure_setting_set_default_settings` | Once the battery is running, you can use this to apply the recommended settings below. |
 | **Configuration (Charging)** | **Information** |

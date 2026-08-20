@@ -35,6 +35,7 @@ Trakteer mij op een kopje koffie ☕️ en volg deze GitHub repository ⭐⭐⭐
 
 1. Zorg ervoor dat **HEMS is uitgeschakeld** in de Zendure-app.
 2. Plaats [Zendure_gielz1986_nl.yaml](./Dutch%20(NL)%20Integration/packages/zendure_gielz1986_nl.yaml) uit de map packages van GitHub in de map packages van Home Assistant. Mocht de map packages niet bestaan maak deze dan aan.
+2b. **Alleen als je een Homewizard P1 hebt**: plaats ook [zendure_gielz1986_homewizard_nl.yaml](./Dutch%20(NL)%20Integration/packages/zendure_gielz1986_homewizard_nl.yaml) in diezelfde map packages. Dit bestand voegt `sensor.homewizard_p1_vermogen` toe. Gebruik je een andere P1/CT-meter (`afwijkende_p1_sensor`)? Sla dit bestand dan over - het bevraagt de P1 elke seconde en vult anders je log met `Error fetching data: http:///api/v1/data failed with ...`.
 3. Maak nu een **backup** van je `configuration.yaml`.
 4. Pas daarna je `configuration.yaml` aan door de onderstaande regel toe te voegen.
 
@@ -63,7 +64,7 @@ homeassistant:
 |-|-|
 | **Configuratie (Basis)** | **Informatie**|  
 | `zendure_2400_ac_ip_adres`       | **bijvoorbeeld 192.168.0.172** – In de Zendure app onder device Information. |  
-| `homewizard_p1_ip_adres`    | **(Instellingsadvies: gebruik een Homewizard P1) bijvoorbeeld 192.168.0.192** – In de Homewizard app (lokale API aanzetten).  |  
+| `homewizard_p1_ip_adres`    | **(Instellingsadvies: gebruik een Homewizard P1) bijvoorbeeld 192.168.0.192** – In de Homewizard app (lokale API aanzetten). Vereist het optionele package bestand `zendure_gielz1986_homewizard_nl.yaml` (zie stap 2b).  |  
 | `zendure_2400_ac_standby_vertraging` | **(Instellingsadvies: 15 minuten) 5-30 minuten** – Geef hier aan hoe snel de omvormer 100% in standby gaat bij 0 activiteit. Dit voorkomt sluipverbruik van +/- 19 watt. | 
 | `zendure_2400_ac_advies_instellingen_overnemen` | Zodra de batterij draait kun je met deze knop de onderstaande instellingsadviezen direct overnemen. | 
 | **Configuratie (Opladen)** |**Informatie**|  
