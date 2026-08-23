@@ -1782,8 +1782,8 @@ rest:
             {% set mapping = {
               5: 2.88,
               70: 1.92,
-              300: 1.92,
               250: 0.96,
+              300: 1.92,
               350: 2.88,
               500: 2.40
             } %}
@@ -2236,7 +2236,7 @@ rest:
          {% else %}
           Not Charging
           {% endif %}
-        icon: mdi:clock-time-four-outline
+        icon: mdi:clock-time-eight-outline
         unique_id: zendure_indication_remaining_charge_time
 
       - name: "Zendure Inverter Temperature"

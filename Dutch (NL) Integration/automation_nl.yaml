@@ -340,7 +340,7 @@ actions:
                 before_offset: "-02:00:00"
               - alias: >-
                   sensor.p1_aansturing_vermogen kleiner dan
-                  input_number.zendure_2400_ac_start_opladen_bij
+                  input_number.zendure_2400_ac_opladen_starten_bij
                 condition: template
                 value_template: |
                   {{ states('sensor.p1_aansturing_vermogen') | float(0)
@@ -900,7 +900,7 @@ actions:
               - aansturing_trigger
           - alias: >-
               sensor.p1_aansturing_vermogen groter dan
-              input_number.zendure_2400_ac_start_ontladen_bij
+              input_number.zendure_2400_ac_ontladen_starten_bij
             condition: template
             value_template: |
               {{ states('sensor.p1_aansturing_vermogen') | float(0)
@@ -1144,7 +1144,7 @@ actions:
               - unknown
           - alias: >-
               sensor.p1_aansturing_vermogen kleiner dan
-              input_number.zendure_2400_ac_start_opladen_bij
+              input_number.zendure_2400_ac_opladen_starten_bij
             condition: template
             value_template: |
               {{ states('sensor.p1_aansturing_vermogen') | float(0)

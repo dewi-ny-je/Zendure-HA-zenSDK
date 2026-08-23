@@ -6,12 +6,12 @@ input_select:
       - Standby
       - Handmatig
       - Nul op de meter
+      - Alleen slim ontladen
+      - Alleen slim opladen
       - Dynamisch NOM
       - Dynamisch NOM (Duur)
       - Dynamisch Handelen
       - Dynamisch Handelen + NOM
-      - Alleen slim ontladen
-      - Alleen slim opladen
       - Snel opladen
       - Snel ontladen
 
