@@ -178,6 +178,8 @@ Add `V` (*vast*, fixed) to keep a window when the settings of tomorrow move into
 
 > Search windows only steer the automatic search. If the same field also contains a fixed period (chapter 1) the automatic search is off, and the window has no effect.
 
+**Dynamic Spread Indication DSC** follows the window. It compares the cheap periods of the plan against the expensive periods that come *after* the first cheap one, and counts the periods a multi-day window picked up on the next day as well; those are shown with a `(+1)` suffix. Expensive periods lying before the first cheap period stay excluded — that is what this sensor measures, and it is the value the dynamic charging automation checks against **Dynamic Minimal Spread**.
+
 ### 4. What happens at midnight
 
 Shortly before midnight the automation calculates the manual period for the new day and shows it in **Dynamic Next Day Manual Period**. At 00:00 that value is written into **Dynamic Manual Period**:
