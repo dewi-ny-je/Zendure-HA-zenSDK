@@ -349,7 +349,6 @@ actions:
                 value_template: |
                   {{ states('sensor.home_energy_meter_power') | float(0)
                      < states('input_number.zendure_setting_start_charging_at') | float(0) }}
-            enabled: false
           - condition: and
             conditions:
               - condition: state
@@ -380,80 +379,6 @@ actions:
               entity_id: input_select.zendure_operation_mode
               name: " "
         alias: Charging to minimum SOC (protection)
-      - conditions:
-          - condition: or
-            conditions:
-              - condition: and
-                conditions:
-                  - condition: trigger
-                    id:
-                      - system_setting_maxsoc
-              - condition: and
-                conditions:
-                  - condition: template
-                    value_template: >-
-                      {{ states('sensor.zendure_maximum_state_of_charge') |
-                      float !=
-                      states('input_number.zendure_setting_maximum_allowed_state_of_charge')
-                      | float }}
-                  - condition: trigger
-                    id:
-                      - aansturing_trigger
-        sequence:
-          - data:
-              sn: "{{ states('sensor.zendure_serial_number') }}"
-              instellingitem: socSet
-              instellinginhoud: >-
-                {{
-                (states('input_number.zendure_setting_maximum_allowed_state_of_charge')
-                | int(0) * 10) }}
-            action: rest_command.zendure_setting
-          - action: logbook.log
-            data:
-              message: >
-                ⚙️Maximum allowed state of charge adjusted to {{
-                states('input_number.zendure_setting_maximum_allowed_state_of_charge')
-                | int }}% —
-              entity_id: input_select.zendure_operation_mode
-              name: " "
-        alias: Adjust maximum allowed state of charge
-      - conditions:
-          - condition: or
-            conditions:
-              - condition: and
-                conditions:
-                  - condition: trigger
-                    id:
-                      - system_setting_minsoc
-              - condition: and
-                conditions:
-                  - condition: template
-                    value_template: >-
-                      {{ states('sensor.zendure_minimum_state_of_charge') |
-                      float !=
-                      states('input_number.zendure_setting_minimum_allowed_state_of_charge')
-                      | float }}
-                  - condition: trigger
-                    id:
-                      - aansturing_trigger
-        sequence:
-          - data:
-              sn: "{{ states('sensor.zendure_serial_number') }}"
-              instellingitem: minSoc
-              instellinginhoud: >-
-                {{
-                (states('input_number.zendure_setting_minimum_allowed_state_of_charge')
-                | int(0) * 10) }}
-            action: rest_command.zendure_setting
-          - action: logbook.log
-            data:
-              message: >
-                ⚙️Minimum allowed state of charge adjusted to {{
-                states('input_number.zendure_setting_minimum_allowed_state_of_charge')
-                | int }}% —
-              entity_id: input_select.zendure_operation_mode
-              name: " "
-        alias: Adjust minimum allowed state of charge
       - conditions:
           - condition: or
             conditions:
@@ -526,6 +451,80 @@ actions:
               entity_id: input_select.zendure_operation_mode
               name: " "
         alias: " Adjust maximum discharge power"
+      - conditions:
+          - condition: or
+            conditions:
+              - condition: and
+                conditions:
+                  - condition: trigger
+                    id:
+                      - system_setting_minsoc
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: >-
+                      {{ states('sensor.zendure_minimum_state_of_charge') |
+                      float !=
+                      states('input_number.zendure_setting_minimum_allowed_state_of_charge')
+                      | float }}
+                  - condition: trigger
+                    id:
+                      - aansturing_trigger
+        sequence:
+          - data:
+              sn: "{{ states('sensor.zendure_serial_number') }}"
+              instellingitem: minSoc
+              instellinginhoud: >-
+                {{
+                (states('input_number.zendure_setting_minimum_allowed_state_of_charge')
+                | int(0) * 10) }}
+            action: rest_command.zendure_setting
+          - action: logbook.log
+            data:
+              message: >
+                ⚙️Minimum allowed state of charge adjusted to {{
+                states('input_number.zendure_setting_minimum_allowed_state_of_charge')
+                | int }}% —
+              entity_id: input_select.zendure_operation_mode
+              name: " "
+        alias: Adjust minimum allowed state of charge
+      - conditions:
+          - condition: or
+            conditions:
+              - condition: and
+                conditions:
+                  - condition: trigger
+                    id:
+                      - system_setting_maxsoc
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: >-
+                      {{ states('sensor.zendure_maximum_state_of_charge') |
+                      float !=
+                      states('input_number.zendure_setting_maximum_allowed_state_of_charge')
+                      | float }}
+                  - condition: trigger
+                    id:
+                      - aansturing_trigger
+        sequence:
+          - data:
+              sn: "{{ states('sensor.zendure_serial_number') }}"
+              instellingitem: socSet
+              instellinginhoud: >-
+                {{
+                (states('input_number.zendure_setting_maximum_allowed_state_of_charge')
+                | int(0) * 10) }}
+            action: rest_command.zendure_setting
+          - action: logbook.log
+            data:
+              message: >
+                ⚙️Maximum allowed state of charge adjusted to {{
+                states('input_number.zendure_setting_maximum_allowed_state_of_charge')
+                | int }}% —
+              entity_id: input_select.zendure_operation_mode
+              name: " "
+        alias: Adjust maximum allowed state of charge
       - conditions:
           - condition: trigger
             id:
@@ -1131,7 +1130,7 @@ actions:
               - unknown
               - Discharge Limit Reached
           - alias: >-
-              sensor.home_energy_meter_power kleiner dan
+              sensor.home_energy_meter_power lower then
               input_number.zendure_setting_start_charging_at
             condition: template
             value_template: |
