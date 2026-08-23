@@ -1387,6 +1387,8 @@ views:
                 name: Highest Price Periods Tomorrow
               - entity: input_text.dynamic_manual_period_tomorrow
                 name: Manual Periods Tomorrow
+              - entity: sensor.dynamic_next_day_manual_period
+                name: Manual Periods For Tomorrow (calculated)
             visibility:
               - condition: time
                 after: "13:30:00"
