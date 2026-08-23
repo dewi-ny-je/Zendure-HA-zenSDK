@@ -1095,15 +1095,8 @@ views:
                 intersect: false
                 enabled: true
                 x:
-                  show: true
-                  formatter: |
-                    EVAL: (val) => {
-                      const hass = document.querySelector("home-assistant")?.hass;
-                      const kwartier = hass?.states["input_boolean.dynamic_setting_15_minute_interval"]?.state === "on";
-                      if (!kwartier) return "";
-                      const d = new Date(val);
-                      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-                    }
+                  format: HH:mm
+                  show: false
                 "y":
                   formatter: |
                     EVAL: (val) => `${val.toFixed(3)} €/kWh`
@@ -1259,15 +1252,8 @@ views:
                     intersect: false
                     enabled: true
                     x:
-                      show: true
-                      formatter: |
-                        EVAL: (val) => {
-                          const hass = document.querySelector("home-assistant")?.hass;
-                          const kwartier = hass?.states["input_boolean.dynamic_setting_15_minute_interval"]?.state === "on";
-                          if (!kwartier) return "";
-                          const d = new Date(val);
-                          return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-                        }
+                      format: HH:mm
+                      show: false
                     "y":
                       formatter: |
                         EVAL: (val) => `${val.toFixed(3)} €/kWh`
