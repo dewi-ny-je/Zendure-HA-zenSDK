@@ -994,11 +994,8 @@ template:
         icon: mdi:percent-box
         unit_of_measurement: "%"
         state: >
-          {% set uren = state_attr('sensor.dynamisch_goedkoopste_periode', 'raw_today') or [] %}
-          {% set duurste = state_attr('sensor.dynamisch_goedkoopste_periode', 'duurste_na_eerste_goedkope') or [] %}
-
-          {% set goedkope_uren = uren | selectattr('goedkoop','equalto','ja') | list %}
-          {% set dure_uren = duurste | list %}
+          {% set goedkope_uren = state_attr('sensor.dynamisch_goedkoopste_periode', 'goedkope_in_venster') or [] %}
+          {% set dure_uren = state_attr('sensor.dynamisch_goedkoopste_periode', 'duurste_na_eerste_goedkope') or [] %}
 
           {% if goedkope_uren | count > 0 and dure_uren | count > 0 %}
             {% set avg_goedkoop = goedkope_uren | map(attribute='value') | sum / goedkope_uren | count %}
@@ -1032,26 +1029,28 @@ template:
               {{ ns.result | join(';') }}
             {% endif %}
           goedkoopste_periode: >
-            {% set uren = state_attr('sensor.dynamisch_goedkoopste_periode', 'raw_today') or [] %}
-            {% set goedkoop = uren | selectattr('goedkoop','equalto','ja') | sort(attribute='start') | list %}
+            {% set vandaag = state_attr('sensor.dynamisch_nordpool', 'raw_today') or [] %}
+            {% set basisdag = (vandaag | first).start[:10] if vandaag | count > 0 else '' %}
+            {% set goedkoop = (state_attr('sensor.dynamisch_goedkoopste_periode', 'goedkope_in_venster') or []) | sort(attribute='start') | list %}
             [
             {% for uur in goedkoop %}
-              "{{ (uur.start | as_datetime).strftime('%H:%M') }} - €{{ '%.4f' | format(uur.value) }}"
+              "{{ (uur.start | as_datetime).strftime('%H:%M') }}{{ ' (+1)' if basisdag != '' and uur.start[:10] != basisdag else '' }} - €{{ '%.4f' | format(uur.value) }}"
               {% if not loop.last %}, {% endif %}
             {% endfor %}
             ]
           duurste_periode: >
-            {% set uren = state_attr('sensor.dynamisch_goedkoopste_periode', 'duurste_na_eerste_goedkope') or [] %}
-            {% set duur = uren | sort(attribute='value', reverse=true) | list %}
+            {% set vandaag = state_attr('sensor.dynamisch_nordpool', 'raw_today') or [] %}
+            {% set basisdag = (vandaag | first).start[:10] if vandaag | count > 0 else '' %}
+            {% set duur = state_attr('sensor.dynamisch_goedkoopste_periode', 'duurste_na_eerste_goedkope') or [] %}
+            {% set duur = duur | sort(attribute='value', reverse=true) | list %}
             [
             {% for uur in duur %}
-              "{{ (uur.start | as_datetime).strftime('%H:%M') }} - €{{ '%.4f' | format(uur.value) }}"
+              "{{ (uur.start | as_datetime).strftime('%H:%M') }}{{ ' (+1)' if basisdag != '' and uur.start[:10] != basisdag else '' }} - €{{ '%.4f' | format(uur.value) }}"
               {% if not loop.last %}, {% endif %}
             {% endfor %}
             ]
           gemiddelde_goedkoop: >
-            {% set uren = state_attr('sensor.dynamisch_goedkoopste_periode', 'raw_today') or [] %}
-            {% set goedkoop = uren | selectattr('goedkoop','equalto','ja') | list %}
+            {% set goedkoop = state_attr('sensor.dynamisch_goedkoopste_periode', 'goedkope_in_venster') or [] %}
             {% if goedkoop | count > 0 %}
               €{{ '%.4f' % (goedkoop | map(attribute='value') | sum / goedkoop | count) }}
             {% else %}
@@ -1321,12 +1320,26 @@ template:
                   'duur': ('ja' if uur.start in d else 'nee')}] -%}
             {%- endfor -%}
             {{- ns.l | to_json -}}
-          duurste_na_eerste_goedkope: >-
-            {%- set prijzen = state_attr('sensor.dynamisch_nordpool', 'raw_today') or [] -%}
+          goedkope_in_venster: >-
+            {%- set vandaag = state_attr('sensor.dynamisch_nordpool', 'raw_today') or [] -%}
+            {%- set morgen = state_attr('sensor.dynamisch_nordpool', 'raw_tomorrow') or [] -%}
             {%- set sel = state_attr('sensor.dynamisch_periode_planning', 'selection') or {} -%}
-            {%- set g = sel.get('tg', []) -%}
-            {%- set d = sel.get('td', []) -%}
-            {%- set goedkope = prijzen
+            {%- set g = sel.get('tg', []) + sel.get('cg', []) -%}
+            {%- set d = sel.get('td', []) + sel.get('cd', []) -%}
+            {%- set ns = namespace(l=[]) -%}
+            {%- for uur in vandaag + morgen if uur.start in g -%}
+              {%- set ns.l = ns.l + [{'start': uur.start, 'end': uur.end, 'value': uur.value,
+                  'goedkoop': 'ja', 'duur': ('ja' if uur.start in d else 'nee')}] -%}
+            {%- endfor -%}
+            {{- ns.l | to_json -}}
+          duurste_na_eerste_goedkope: >-
+            {%- set vandaag = state_attr('sensor.dynamisch_nordpool', 'raw_today') or [] -%}
+            {%- set morgen = state_attr('sensor.dynamisch_nordpool', 'raw_tomorrow') or [] -%}
+            {%- set sel = state_attr('sensor.dynamisch_periode_planning', 'selection') or {} -%}
+            {%- set g = sel.get('tg', []) + sel.get('cg', []) -%}
+            {%- set d = sel.get('td', []) + sel.get('cd', []) -%}
+            {%- set venster = vandaag + morgen -%}
+            {%- set goedkope = venster
               | selectattr('start', 'in', g)
               | map(attribute='start')
               | map('as_datetime')
@@ -1335,8 +1348,8 @@ template:
               | list -%}
             {%- set eerste_goedkoop = goedkope | first if goedkope else none -%}
             {%- set ns = namespace(l=[]) -%}
-            {%- if prijzen and eerste_goedkoop -%}
-              {%- for uur in prijzen if uur.start in d and (uur.start | as_datetime) > eerste_goedkoop -%}
+            {%- if eerste_goedkoop -%}
+              {%- for uur in venster if uur.start in d and (uur.start | as_datetime) > eerste_goedkoop -%}
                 {%- set ns.l = ns.l + [{'start': uur.start, 'end': uur.end, 'value': uur.value,
                     'goedkoop': ('ja' if uur.start in g else 'nee'), 'duur': 'ja'}] -%}
               {%- endfor -%}

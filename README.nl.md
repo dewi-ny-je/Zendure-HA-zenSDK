@@ -169,6 +169,8 @@ Zet er een `V` (vast) achter om een venster te behouden wanneer om middernacht d
 
 > Zoekvensters sturen alleen de automatische berekening. Staat er in hetzelfde veld ook een vaste periode (hoofdstuk 1), dan staat de berekening uit en heeft het venster geen effect.
 
+**Dynamisch Spread Indicatie NOM** volgt het venster. De sensor vergelijkt de goedkope periodes van het plan met de dure periodes die *na* de eerste goedkope periode liggen, en telt daarbij ook de periodes mee die een meerdaags venster op de volgende dag heeft gekozen; die krijgen het achtervoegsel `(+1)`. Dure periodes vóór de eerste goedkope periode blijven buiten beschouwing — dat is nu juist wat deze sensor meet, en het is de waarde waarop de dynamische laadautomatisering controleert tegen **Dynamisch Minimale Spread**.
+
 ### 4. Wat er om middernacht gebeurt
 
 Vlak vóór middernacht berekent de automatisering de handmatige periode voor de nieuwe dag en toont die in **Dynamisch Handmatige Periode Volgende Dag**. Om 00:00 wordt die waarde in **Dynamisch Handmatige Periode** gezet:
