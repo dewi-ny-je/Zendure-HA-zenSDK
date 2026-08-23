@@ -1,1 +1,68 @@
+# OS-generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# Logs
+*.log
+logs/
+
+# Dependency directories
+node_modules/
+vendor/
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Build output
+dist/
+build/
+out/
+target/
+*.o
+*.obj
+*.exe
+*.class
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Package manager files (often kept, sometimes ignored — depends on project)
+# package-lock.json
+# yarn.lock
+
+# Coverage / test artifacts
+coverage/
+*.cover
+.nyc_output/
+htmlcov/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
