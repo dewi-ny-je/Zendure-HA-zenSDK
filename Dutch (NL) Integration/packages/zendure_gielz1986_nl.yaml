@@ -6,12 +6,12 @@ input_select:
       - Standby
       - Handmatig
       - Nul op de meter
+      - Alleen slim ontladen
+      - Alleen slim opladen
       - Dynamisch NOM
       - Dynamisch NOM (Duur)
       - Dynamisch Handelen
       - Dynamisch Handelen + NOM
-      - Alleen slim ontladen
-      - Alleen slim opladen
       - Snel opladen
       - Snel ontladen
 
@@ -1832,8 +1832,8 @@ rest:
             {% set mapping = {
               5: 2.88,
               70: 1.92,
-              250: 0.96,
               240: 1.92,
+              250: 0.96,
               300: 1.92,
               350: 2.88,
               500: 2.40

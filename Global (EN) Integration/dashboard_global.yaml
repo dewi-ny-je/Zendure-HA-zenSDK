@@ -2789,6 +2789,16 @@ views:
                   action: more-info
           - type: markdown
             content: >-
+              <ha-alert alert-type="error">Warning</ha-alert>The minimum allowed
+              state of charge is set below 10%. This is not recommended by
+              Zendure.
+            text_only: true
+            visibility:
+              - condition: numeric_state
+                entity: sensor.zendure_minimum_state_of_charge
+                below: 10
+          - type: markdown
+            content: >-
               <ha-alert alert-type="info">Help text</ha-alert>Set the minimum
               and maximum allowed state of charge percentages here.
 
@@ -2802,16 +2812,6 @@ views:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
                 state: 'on'
-          - type: markdown
-            content: >-
-              <ha-alert alert-type="error">Warning</ha-alert>The minimum allowed
-              state of charge is set below 10%. This is not recommended by
-              Zendure.
-            text_only: true
-            visibility:
-              - condition: numeric_state
-                entity: sensor.zendure_minimum_state_of_charge
-                below: 10
           - type: entities
             entities:
               - entity: input_boolean.zendure_setting_soc_protection_disabled
@@ -2861,7 +2861,7 @@ views:
               You can also set a custom battery order here under **Battery
               Order⚙️**. This allows you to define a different order of the
               batteries yourself. The correct order can be determined using
-              **sensor.zendure_battery_serienumbers** and the sticker on the
+              **sensor.zendure_battery_serial_numbers** and the sticker on the
               battery(ies). This ensures that the battery temperatures and
               charge percentages follow the correct order as they are physically
               stacked.
