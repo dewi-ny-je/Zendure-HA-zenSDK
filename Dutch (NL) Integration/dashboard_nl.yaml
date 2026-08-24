@@ -1394,8 +1394,13 @@ views:
                 name: Duurste Periodes Morgen
               - entity: input_text.dynamisch_handmatige_periode_morgen
                 name: Handmatige Periodes Morgen
-              - entity: sensor.dynamisch_handmatige_periode_volgende_dag
-                name: Handmatige Periodes Voor Morgen (berekend)
+              - type: conditional
+                conditions:
+                  - entity: sensor.dynamisch_handmatige_periode_volgende_dag
+                    state_not: ""
+                row:
+                  entity: sensor.dynamisch_handmatige_periode_volgende_dag
+                  name: Handmatige Periodes Voor Morgen (berekend)
             visibility:
               - condition: time
                 after: "13:30:00"
