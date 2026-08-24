@@ -380,7 +380,7 @@ template:
       - name: "Zendure 2400 AC Configuratie Versie"
         unique_id: Zendure_2400_AC_Configuratie_Versie
         icon: mdi:one-up
-        state: "v20260716"
+        state: "v20260824"
 
       - name: "Zendure 2400 AC Laatste Kalibratie (Dagen)"
         unique_id: Zendure_2400_AC_Laatste_Kalibratie_Dagen
@@ -1537,24 +1537,21 @@ template:
           {% set laad = states('sensor.zendure_2400_ac_laadpercentage') | float(0) %}
           {% set max_laad = states('sensor.zendure_2400_ac_maximale_laadpercentage') | float(100) %}
           {% set totale_capaciteit = states('sensor.zendure_2400_ac_totale_capaciteit') | float(0) %}
-
           {% set import_eff = states('sensor.zendure_2400_ac_efficientie_import_24u_gemiddelde') | float(0) %}
           {% set rte_totaal = states('sensor.zendure_2400_ac_rte_totaal') | float(0) %}
-
           {% set effectief_laad = [laad, max_laad] | min %}
           {% set rte_import_equivalent = (rte_totaal / 100) ** 0.5 * 100 %}
-
           {% if import_eff < 70 %}
             {% set effectieve_eff = rte_import_equivalent %}
           {% else %}
             {% set effectieve_eff = import_eff %}
           {% endif %}
-
           {% set effectieve_eff = [effectieve_eff, 100] | min / 100 %}
           {% set benodigd_percentage = max_laad - effectief_laad %}
-
           {% if benodigd_percentage <= 0 %}
             0
+          {% elif effectieve_eff <= 0 %}
+            {{ none }}
           {% else %}
             {{ (benodigd_percentage / 100 * totale_capaciteit / effectieve_eff) | round(2) }}
           {% endif %}
@@ -1565,10 +1562,8 @@ template:
             {% set laad = states('sensor.zendure_2400_ac_laadpercentage') | float(0) %}
             {% set max_laad = states('sensor.zendure_2400_ac_maximale_laadpercentage') | float(100) %}
             {% set totale_capaciteit = states('sensor.zendure_2400_ac_totale_capaciteit') | float(0) %}
-
             {% set effectief_laad = [laad, max_laad] | min %}
             {% set benodigd_percentage = max_laad - effectief_laad %}
-
             {% if benodigd_percentage <= 0 %}
               0
             {% else %}
@@ -1582,17 +1577,22 @@ template:
             {% set import_eff = states('sensor.zendure_2400_ac_efficientie_import_24u_gemiddelde') | float(0) %}
             {% set rte_totaal = states('sensor.zendure_2400_ac_rte_totaal') | float(0) %}
             {% set rte_import_equivalent = (rte_totaal / 100) ** 0.5 * 100 %}
-            {% if import_eff < 70 %}
+            {% if import_eff >= 70 %}
+              {{ import_eff | round(1) }} %
+            {% elif rte_import_equivalent > 0 %}
               {{ rte_import_equivalent | round(1) }} %
             {% else %}
-              {{ import_eff | round(1) }} %
+              Onbekend
             {% endif %}
           bron_import_efficiëntie: >
             {% set import_eff = states('sensor.zendure_2400_ac_efficientie_import_24u_gemiddelde') | float(0) %}
-            {% if import_eff < 70 %}
+            {% set rte_totaal = states('sensor.zendure_2400_ac_rte_totaal') | float(0) %}
+            {% if import_eff >= 70 %}
+              Import efficiëntie 24u gemiddelde
+            {% elif rte_totaal > 0 %}
               RTE totaal (√RTE × 100)
             {% else %}
-              Import efficiëntie 24u gemiddelde
+              Nog geen geldige efficiëntiedata
             {% endif %}
 
       - name: "Zendure 2400 AC RTE Totaal"
@@ -1631,7 +1631,7 @@ rest:
         icon: mdi:battery-heart-variant
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% if not packdata %}
             unknown
           {% elif volgorde_raw in ['unknown','unavailable',''] %}
@@ -1660,7 +1660,7 @@ rest:
         icon: mdi:battery-heart-variant
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% if not packdata %}
             unknown
           {% elif volgorde_raw in ['unknown','unavailable',''] %}
@@ -1689,7 +1689,7 @@ rest:
         icon: mdi:battery-heart-variant
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% if not packdata %}
             unknown
           {% elif volgorde_raw in ['unknown','unavailable',''] %}
@@ -1718,7 +1718,7 @@ rest:
         icon: mdi:battery-heart-variant
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% if not packdata %}
             unknown
           {% elif volgorde_raw in ['unknown','unavailable',''] %}
@@ -1747,7 +1747,7 @@ rest:
         icon: mdi:battery-heart-variant
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% if not packdata %}
             unknown
           {% elif volgorde_raw in ['unknown','unavailable',''] %}
@@ -1776,7 +1776,7 @@ rest:
         icon: mdi:battery-heart-variant
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% if not packdata %}
             unknown
           {% elif volgorde_raw in ['unknown','unavailable',''] %}
@@ -1968,7 +1968,7 @@ rest:
       - name: "Zendure 2400 AC Batterij Serienummers"
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% set ns = namespace(sn_list=[]) %}
           {% if not packdata %}
             unknown
@@ -1992,7 +1992,7 @@ rest:
       - name: "Zendure 2400 AC Batterij 1 Laadpercentage"
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% if not packdata %}
             unknown
           {% elif volgorde_raw in ['unknown', 'unavailable', ''] %}
@@ -2009,7 +2009,7 @@ rest:
       - name: "Zendure 2400 AC Batterij 2 Laadpercentage"
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% if not packdata %}
             unknown
           {% elif volgorde_raw in ['unknown', 'unavailable', ''] %}
@@ -2026,7 +2026,7 @@ rest:
       - name: "Zendure 2400 AC Batterij 3 Laadpercentage"
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% if not packdata %}
             unknown
           {% elif volgorde_raw in ['unknown', 'unavailable', ''] %}
@@ -2043,7 +2043,7 @@ rest:
       - name: "Zendure 2400 AC Batterij 4 Laadpercentage"
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% if not packdata %}
             unknown
           {% elif volgorde_raw in ['unknown', 'unavailable', ''] %}
@@ -2060,7 +2060,7 @@ rest:
       - name: "Zendure 2400 AC Batterij 5 Laadpercentage"
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% if not packdata %}
             unknown
           {% elif volgorde_raw in ['unknown', 'unavailable', ''] %}
@@ -2077,7 +2077,7 @@ rest:
       - name: "Zendure 2400 AC Batterij 6 Laadpercentage"
         value_template: >
           {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
-          {% set packdata = value_json['packData'] %}
+          {% set packdata = value_json.get('packData', []) %}
           {% if not packdata %}
             unknown
           {% elif volgorde_raw in ['unknown', 'unavailable', ''] %}

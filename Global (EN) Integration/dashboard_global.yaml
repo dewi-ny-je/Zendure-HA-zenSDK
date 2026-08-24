@@ -1251,7 +1251,7 @@ views:
                 enabled: true
                 x:
                   format: HH:mm
-                  show: true
+                  show: false
                 "y":
                   formatter: |
                     EVAL: (val) => `${val.toFixed(3)} €/kWh`
@@ -1281,9 +1281,7 @@ views:
                 axisTicks:
                   show: false
                 axisBorder:
-                  color: >-
-                    color-mix(in srgb, var(--divider-color) 50%,
-                    transparent)
+                  color: color-mix(in srgb, var(--divider-color) 50%, transparent)
               legend:
                 show: false
             span:
