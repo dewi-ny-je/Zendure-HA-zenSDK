@@ -1,5 +1,5 @@
 alias: Zendure zenSDK (Gielz) Global
-description: Configuration Version (v20260716)
+description: Configuration Version (v20260824)
 triggers:
   - seconds: /5
     id: aansturing_trigger
@@ -1357,9 +1357,6 @@ actions:
               - condition: trigger
                 id:
                   - aansturing_trigger
-              - condition: trigger
-                id:
-                  - handmatig_trigger
           - condition: state
             entity_id: input_select.zendure_operation_mode
             state:
@@ -1394,9 +1391,6 @@ actions:
               - condition: trigger
                 id:
                   - aansturing_trigger
-              - condition: trigger
-                id:
-                  - handmatig_trigger
           - condition: state
             entity_id: input_select.zendure_operation_mode
             state:
