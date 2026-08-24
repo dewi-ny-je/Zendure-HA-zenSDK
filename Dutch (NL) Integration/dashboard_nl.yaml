@@ -1125,6 +1125,8 @@ views:
                         color-mix(in srgb, var(--primary-text-color) 75%,
                         transparent)
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1280,6 +1282,8 @@ views:
                         color-mix(in srgb, var(--primary-text-color) 75%,
                         transparent)
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
