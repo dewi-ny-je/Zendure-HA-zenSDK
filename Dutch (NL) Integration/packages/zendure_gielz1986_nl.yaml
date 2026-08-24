@@ -1364,11 +1364,14 @@ template:
             {%- set sel = state_attr('sensor.dynamisch_periode_planning', 'selection') or {} -%}
             {%- set g = sel.get('mg', []) -%}
             {%- set d = sel.get('md', []) -%}
+            {%- set cg = sel.get('cg', []) -%}
+            {%- set cd = sel.get('cd', []) -%}
             {%- set ns = namespace(l=[]) -%}
             {%- for uur in prijzen -%}
               {%- set ns.l = ns.l + [{'start': uur.start, 'end': uur.end, 'value': uur.value,
                   'goedkoop': ('ja' if uur.start in g else 'nee'),
-                  'duur': ('ja' if uur.start in d else 'nee')}] -%}
+                  'duur': ('ja' if uur.start in d else 'nee'),
+                  'overdracht': ('G' if uur.start in cg else ('D' if uur.start in cd else ''))}] -%}
             {%- endfor -%}
             {{- ns.l | to_json -}}
           goedkope_in_venster: >-

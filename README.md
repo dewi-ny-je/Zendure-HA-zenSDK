@@ -188,6 +188,8 @@ Shortly before midnight the automation calculates the manual period for the new 
 * a window marked with `V` in today's field is kept and replaces the window of the same type (`Z`, `ZG` or `ZD`) that came from tomorrow;
 * every period of tomorrow that was selected by today's multi-day search window is added as a modifier, for example `+G00:00-02:00;+D09:00`, so that a plan made across midnight is really carried out.
 
+Those carried periods are drawn on the **Dynamic Tomorrow** chart in a lighter tone of the same colour, because they come from today's plan and not from tomorrow's own calculation. A period claimed by both is drawn in the lighter tone: today's window is what actually ends up in the field at midnight.
+
 ---
 
 ## 🔃 (Optional) Plug-N-Play Dashboard

@@ -181,6 +181,8 @@ Vlak vóór middernacht berekent de automatisering de handmatige periode voor de
 * een venster met `V` uit het veld van vandaag blijft staan en vervangt het venster van hetzelfde type (`Z`, `ZG` of `ZD`) dat van morgen komt;
 * elke periode van morgen die door het meerdaagse zoekvenster van vandaag gekozen is, wordt als aanpassing toegevoegd, bijvoorbeeld `+G00:00-02:00;+D09:00`, zodat een plan dat over middernacht heen gemaakt is ook echt uitgevoerd wordt.
 
+Die overgedragen periodes worden op de grafiek **Dynamisch Morgen** in een lichtere tint van dezelfde kleur getekend, omdat ze uit het plan van vandaag komen en niet uit de eigen berekening van morgen. Een periode die door beide gekozen is, krijgt de lichtere tint: het venster van vandaag is wat om middernacht daadwerkelijk in het veld terechtkomt.
+
 ---
 
 ## 🔃 (Optioneel) Plug-N-Play Dashboard
