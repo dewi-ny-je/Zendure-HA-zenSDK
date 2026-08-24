@@ -1,5 +1,5 @@
 alias: Zendure zenSDK (Gielz)
-description: Configuratie Versie (v20260716)
+description: Configuratie Versie (v20260824)
 triggers:
   - seconds: /5
     id: aansturing_trigger
@@ -1373,9 +1373,6 @@ actions:
               - condition: trigger
                 id:
                   - aansturing_trigger
-              - condition: trigger
-                id:
-                  - handmatig_trigger
           - condition: state
             entity_id: input_select.zendure_2400_ac_modus_selecteren
             state: Handmatig
@@ -1412,9 +1409,6 @@ actions:
               - condition: trigger
                 id:
                   - aansturing_trigger
-              - condition: trigger
-                id:
-                  - handmatig_trigger
           - condition: state
             entity_id: input_select.zendure_2400_ac_modus_selecteren
             state: Handmatig
