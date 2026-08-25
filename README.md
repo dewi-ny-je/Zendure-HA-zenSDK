@@ -1,14 +1,30 @@
+
 # Zendure Home Assistant Integration
 Choose your preferred language
 
  [![English 🌍 Global](https://img.shields.io/badge/English-Global-blue?style=for-the-badge)](README.md) [![Dutch 🇳🇱 NL](https://img.shields.io/badge/Dutch-NL-orange?style=for-the-badge)](README.nl.md)<br><br>
+
+
+### Changes over the [upstream package](https://github.com/Gielz1986/Zendure-HA-zenSDK) by Gielz1986
+* accept Frank Energie prices as dynamic price source, without requiring Nordpool
+	* a very common integration, also [actively developed](https://github.com/HiDiHo01/home-assistant-frank_energie/) 
+* all P1 meters are moved to independent package files
+	* to unify experience no matter the meter, and to avoid spamming the Home Assistant logs with thousands of messages
+	* upload the package corresponding to your meter, edit the IP to the correct one, introduce the correct entity name in the configuration tab of the dashboard
+* Add modifier and search-window syntax to dynamic manual periods
+	* you can modify the automatically found timeslots by using "+" or "-" in front of a range: "+D8:00-9:15;-G11:15", and it  makes applying minor changes to the automatic timeslots WAY easier
+	* allows searching (best hours, only expensive, only cheap: Z/ZD/ZG) in arbitrary time intervals, also crossing a midnight boundary: to search expensive timeslots only between afternoon and next morning, I use "ZD14:00-13:45V". The suffix "V" means that it's going to stay and it won't be removed at midnight, when next day's timeslots are copied into today's timeslots
+	* calculation od spread is performed according to the search command, not exclusively within a day
+	* timeslots found in the next day are plotted in a different colour
+* Dutch and Global version has discrepancies, now they have been brought in agreement
+* Apexcharts recently changed default settings, so I made x-axis tooltips explicitly active, so I can use my more modern [apexcharts-card integration](https://github.com/dewi-ny-je/apexcharts-card)
+
+The additional features introduced are copyrighted by @dewi-ny-je, the original features are copyrighted by @Gielz1986
+
 ![Preview](Images/Global-Dashboard-290526.gif)
-<a href="https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-%E2%80%90-Available-entities">
-Go to the explanation of all entities and the dashboard
-</a>
 
+[Go to the explanation of all entities and the dashboard](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-%E2%80%90-Available-entities)
 
-<br>
 
 **Get your battery running locally in Home Assistant in just 2️⃣ simple steps.**
 

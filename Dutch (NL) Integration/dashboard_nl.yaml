@@ -1100,7 +1100,7 @@ views:
                 enabled: true
                 x:
                   format: HH:mm
-                  show: true
+                  show: false
                 "y":
                   formatter: |
                     EVAL: (val) => `${val.toFixed(3)} €/kWh`

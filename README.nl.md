@@ -1,11 +1,23 @@
 #  Zendure Home Assistant Integratie
 
-![Preview](Images/NL-Dashboard-290526.gif) <br>
-<a href="https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/NL-%E2%80%90-Beschikbare-entiteiten">
-Ga naar de uitleg over alle entiteiten en het dashboard
-</a>
+### Wijzigingen ten opzichte van het [upstream-pakket](https://github.com/Gielz1986/Zendure-HA-zenSDK) van Gielz1986
+* accepteert Frank Energie-prijzen als bron voor dynamische prijzen, zonder dat Nordpool nodig is
+	* een veelgebruikte integratie, die bovendien [actief ontwikkeld](https://github.com/HiDiHo01/home-assistant-frank_energie/) wordt
+* alle P1-meters zijn verplaatst naar losse package-bestanden
+	* om de ervaring gelijk te trekken ongeacht de meter, en om te voorkomen dat de Home Assistant-logs worden volgespamd met duizenden meldingen
+	* upload het package dat bij jouw meter hoort, pas het IP-adres aan naar het juiste adres en vul de juiste entiteitsnaam in op het configuratietabblad van het dashboard
+* Modifier- en zoekvenstersyntaxis toegevoegd aan dynamische handmatige periodes
+	* je kunt de automatisch gevonden tijdvakken aanpassen door "+" of "-" vóór een bereik te zetten: "+D8:00-9:15;-G11:15", waardoor kleine aanpassingen aan de automatische tijdvakken VEEL eenvoudiger worden
+	* maakt zoeken mogelijk (beste uren, alleen duur, alleen goedkoop: Z/ZD/ZG) binnen willekeurige tijdsintervallen, ook over middernacht heen: om alleen tussen de middag en de volgende ochtend naar dure tijdvakken te zoeken, gebruik ik "ZD14:00-13:45V". Het achtervoegsel "V" betekent dat het blijft staan en niet om middernacht wordt verwijderd, wanneer de tijdvakken van de volgende dag naar vandaag worden gekopieerd
+	* de berekening van de spreiding gebeurt volgens het zoekcommando, niet uitsluitend binnen één dag
+	* tijdvakken die in de volgende dag worden gevonden, worden in een andere kleur weergegeven
+* De Nederlandse en de Global-versie weken van elkaar af; die zijn nu met elkaar in overeenstemming gebracht
+* Apexcharts heeft onlangs de standaardinstellingen gewijzigd, daarom heb ik de tooltips op de x-as expliciet ingeschakeld om [mijne Apexcharts](https://github.com/dewi-ny-je/apexcharts-card/) te kunnen gebruiken
 
-<br>
+![Preview](Images/NL-Dashboard-290526.gif)
+
+[Ga naar de uitleg over alle entiteiten en het dashboard](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/NL-%E2%80%90-Beschikbare-entiteiten)
+
 
 **Om in slechts 2️⃣ simpele stappen je batterij volledig lokaal werkend te krijgen in Home Assistant.**
 
