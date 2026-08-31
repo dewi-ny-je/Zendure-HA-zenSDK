@@ -1483,17 +1483,17 @@ actions:
             then:
               - alias: >-
                   Widen the cheapest periods from 11 up to 23 and keep the last count whose
-                  spread stays within 2% of the lowest price of the day
+                  average price stays within 2% of the average over the 11 cheapest periods
                 variables:
                   optimal_periods: >-
                     {% set prijzen = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
                     {% set waarden = prijzen | map(attribute='value') | map('float') | sort | list %}
-                    {% set laagste = waarden | first %}
-                    {% set drempel = 0.02 * (laagste | abs) %}
+                    {% set basis = (waarden[:11] | sum) / 11 %}
+                    {% set drempel = 0.02 * (basis | abs) %}
                     {% set maxn = [23, waarden | count] | min %}
                     {% set ns = namespace(gekozen=maxn, gevonden=false) %}
-                    {% for x in range(11, maxn + 1) %}
-                    {% if not ns.gevonden and (waarden[x - 1] - laagste) > drempel %}
+                    {% for x in range(12, maxn + 1) %}
+                    {% if not ns.gevonden and ((waarden[:x] | sum) / x - basis) > drempel %}
                     {% set ns.gekozen = x - 1 %}
                     {% set ns.gevonden = true %}
                     {% endif %}

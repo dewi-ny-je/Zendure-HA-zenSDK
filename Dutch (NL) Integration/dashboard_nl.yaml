@@ -2911,8 +2911,8 @@ views:
 
               Staat **Oplaadvermogen Optimalisatie⚙️** aan, dan wordt elke nacht
               het aantal goedkoopste periodes uitgebreid van 11 tot 23, zolang
-              de spread binnen die periodes binnen 2% van de laagste prijs van
-              de dag blijft. Het gevonden aantal komt in **Goedkoopste
+              de gemiddelde prijs over die periodes binnen 2% van het gemiddelde
+              over de 11 goedkoopste periodes blijft. Het gevonden aantal komt in **Goedkoopste
               Periodes** te staan en het bijbehorende vermogen in **Dynamisch
               Oplaadvermogen**, waarmee Dynamisch Handelen laadt in plaats van
               met het maximale oplaadvermogen. Ontladen blijft op het maximale
