@@ -25,6 +25,10 @@ input_boolean:
     name: Dynamic 15 Minutes Interval
     icon: mdi:clock-time-three-outline
 
+  dynamic_setting_charge_power_optimisation:
+    name: Dynamic Charge Power Optimisation
+    icon: mdi:auto-fix
+
   dynamic_recently_charged:
     name: Dynamic Recently Charged
     icon: mdi:battery-check
@@ -228,6 +232,15 @@ input_number:
     max: 96
     step: 1
     mode: box
+
+  dynamic_charge_power:
+    name: Dynamic Charge Power
+    icon: mdi:battery-charging-medium
+    min: 0
+    max: 12000
+    step: 1
+    mode: box
+    unit_of_measurement: "W"
 
   zendure_setting_minimum_allowed_state_of_charge:
     name: Zendure Minimum Allowed State Of Charge

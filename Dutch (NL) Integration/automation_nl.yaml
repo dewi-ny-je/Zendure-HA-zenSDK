@@ -47,6 +47,11 @@ triggers:
     id: modus_dynamisch_spread
   - trigger: state
     entity_id:
+      - input_boolean.dynamisch_oplaadvermogen_optimalisatie
+      - input_text.dynamisch_handmatige_periode
+    id: dynamisch_oplaadvermogen_optimalisatie
+  - trigger: state
+    entity_id:
       - input_number.zendure_2400_ac_max_oplaadvermogen
     id: systeem_instelling_maxoplaadvermogen
   - trigger: state
@@ -1464,6 +1469,7 @@ actions:
           - condition: trigger
             id:
               - dynamisch_middernacht
+              - dynamisch_oplaadvermogen_optimalisatie
           - condition: template
             value_template: >-
               {{
@@ -1471,45 +1477,148 @@ actions:
               }}
             alias: input_text.dynamisch_nordpool_sensor is gevuld
         sequence:
-          - alias: Zet goedkoopste periode van morgen naar vandaag
-            target:
-              entity_id: input_number.dynamisch_goedkoopste_x_periode
-            data:
-              value: >-
-                {{ states('input_number.dynamisch_goedkoopste_x_periode_morgen')
-                | float }}
-            action: input_number.set_value
-          - alias: Zet duurste periode van morgen naar vandaag
-            target:
-              entity_id: input_number.dynamisch_duurste_x_periode
-            data:
-              value: >-
-                {{ states('input_number.dynamisch_duurste_x_periode_morgen') |
-                float }}
-            action: input_number.set_value
-          - alias: Zet handmatige periode van morgen naar vandaag
-            target:
-              entity_id: input_text.dynamisch_handmatige_periode
-            data:
-              value: "{% set berekend = states('input_text.dynamisch_handmatige_periode_volgende') %}{% set morgen = states('input_text.dynamisch_handmatige_periode_morgen') %}{{ berekend if berekend not in ['unknown', 'unavailable', ''] else ('' if morgen in ['unknown', 'unavailable'] else morgen) }}"
-            action: input_text.set_value
-          - alias: Reset handmatige periode van morgen
-            target:
-              entity_id: input_text.dynamisch_handmatige_periode_morgen
-            data:
-              value: ""
-            action: input_text.set_value
-          - alias: Reset berekende handmatige periode
-            target:
-              entity_id: input_text.dynamisch_handmatige_periode_volgende
-            data:
-              value: ""
-            action: input_text.set_value
-          - action: logbook.log
-            data:
-              message: ⚙️Dynamische instelling overzetten van morgen naar vandaag —
-              entity_id: input_select.zendure_2400_ac_modus_selecteren
-              name: " "
+          - alias: Dynamische instellingen van morgen naar vandaag, alleen om middernacht
+            if:
+              - condition: trigger
+                id:
+                  - dynamisch_middernacht
+            then:
+              - alias: Zet goedkoopste periode van morgen naar vandaag
+                target:
+                  entity_id: input_number.dynamisch_goedkoopste_x_periode
+                data:
+                  value: >-
+                    {{ states('input_number.dynamisch_goedkoopste_x_periode_morgen')
+                    | float }}
+                action: input_number.set_value
+              - alias: Zet duurste periode van morgen naar vandaag
+                target:
+                  entity_id: input_number.dynamisch_duurste_x_periode
+                data:
+                  value: >-
+                    {{ states('input_number.dynamisch_duurste_x_periode_morgen') |
+                    float }}
+                action: input_number.set_value
+              - alias: Zet handmatige periode van morgen naar vandaag
+                target:
+                  entity_id: input_text.dynamisch_handmatige_periode
+                data:
+                  value: "{% set berekend = states('input_text.dynamisch_handmatige_periode_volgende') %}{% set morgen = states('input_text.dynamisch_handmatige_periode_morgen') %}{{ berekend if berekend not in ['unknown', 'unavailable', ''] else ('' if morgen in ['unknown', 'unavailable'] else morgen) }}"
+                action: input_text.set_value
+              - alias: Reset handmatige periode van morgen
+                target:
+                  entity_id: input_text.dynamisch_handmatige_periode_morgen
+                data:
+                  value: ""
+                action: input_text.set_value
+              - alias: Reset berekende handmatige periode
+                target:
+                  entity_id: input_text.dynamisch_handmatige_periode_volgende
+                data:
+                  value: ""
+                action: input_text.set_value
+              - action: logbook.log
+                data:
+                  message: ⚙️Dynamische instelling overzetten van morgen naar vandaag —
+                  entity_id: input_select.zendure_2400_ac_modus_selecteren
+                  name: " "
+          - alias: Optimaliseer het aantal goedkoopste periodes en het dynamische oplaadvermogen
+            if:
+              - alias: Optimalisatie van het oplaadvermogen is ingeschakeld
+                condition: state
+                entity_id: input_boolean.dynamisch_oplaadvermogen_optimalisatie
+                state: "on"
+              - alias: Vandaag is niet vastgezet met absolute handmatige periodes (stijl G14:00)
+                condition: template
+                value_template: >-
+                  {% set txt = states('input_text.dynamisch_handmatige_periode') %}
+                  {% set txt = '' if txt in ['unknown', 'unavailable'] else txt %}
+                  {% set ns = namespace(vast=false) %}
+                  {% for deel in txt.split(';') %}
+                  {% set t = deel | trim | replace(' ', '') | upper %}
+                  {% if t | regex_match('^[GD][0-9]{1,2}:[0-9]{2}(-[0-9]{1,2}:[0-9]{2})?$') %}
+                  {% set ns.vast = true %}
+                  {% endif %}
+                  {% endfor %}
+                  {{ not ns.vast }}
+            then:
+              - alias: Wachten tot de dynamische prijzen van vandaag beschikbaar zijn
+                wait_template: >-
+                  {% set p = state_attr('sensor.dynamisch_goedkoopste_periode', 'raw_today') or [] %}
+                  {{ p | count >= 11 and (p[0]['start'] | as_datetime | as_local).date() == now().date() }}
+                timeout: "00:10:00"
+                continue_on_timeout: true
+              - alias: Pas de optimalisatie toe zodra de prijzen van vandaag beschikbaar zijn
+                if:
+                  - alias: De prijzen van vandaag zijn beschikbaar
+                    condition: template
+                    value_template: >-
+                      {% set p = state_attr('sensor.dynamisch_goedkoopste_periode', 'raw_today') or [] %}
+                      {{ p | count >= 11 and (p[0]['start'] | as_datetime | as_local).date() == now().date() }}
+                else:
+                  - alias: >-
+                      Geen prijzen voor vandaag, wis het oplaadvermogen zodat Dynamisch Handelen
+                      terugvalt op het maximale oplaadvermogen
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamisch_oplaadvermogen
+                    data:
+                      value: 0
+                then:
+                  - alias: >-
+                      Vergroot de goedkoopste periodes van 11 tot 23 en houd het laatste aantal
+                      waarvan de gemiddelde prijs binnen 2% van het gemiddelde over de 11
+                      goedkoopste periodes blijft
+                    variables:
+                      optimal_periods: >-
+                        {% set prijzen = state_attr('sensor.dynamisch_goedkoopste_periode', 'raw_today') or [] %}
+                        {% set waarden = prijzen | map(attribute='value') | map('float') | sort | list %}
+                        {% set basis = (waarden[:11] | sum) / 11 %}
+                        {% set drempel = 0.02 * (basis | abs) %}
+                        {% set maxn = [23, waarden | count] | min %}
+                        {% set ns = namespace(gekozen=maxn, gevonden=false) %}
+                        {% for x in range(12, maxn + 1) %}
+                        {% if not ns.gevonden and ((waarden[:x] | sum) / x - basis) > drempel %}
+                        {% set ns.gekozen = x - 1 %}
+                        {% set ns.gevonden = true %}
+                        {% endif %}
+                        {% endfor %}
+                        {{ ns.gekozen }}
+                  - alias: Oplaadvermogen via y = 6.3131x² - 341.16x + 6002.5, begrensd op het max. oplaadvermogen
+                    variables:
+                      optimal_power: >-
+                        {% set x = optimal_periods | int %}
+                        {{ [ (6.3131 * x * x - 341.16 * x + 6002.5) | round(0) | int,
+                        states('input_number.zendure_2400_ac_max_oplaadvermogen') | int(12000) ] | min }}
+                  - alias: Zet het geoptimaliseerde aantal goedkoopste periodes voor vandaag
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamisch_goedkoopste_x_periode
+                    data:
+                      value: "{{ optimal_periods | int }}"
+                  - alias: Zet het dynamische oplaadvermogen voor vandaag
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamisch_oplaadvermogen
+                    data:
+                      value: "{{ optimal_power | int }}"
+                  - action: logbook.log
+                    data:
+                      message: >-
+                        ⚙️Dynamisch oplaadvermogen geoptimaliseerd naar {{ optimal_power | int }} watt
+                        over de {{ optimal_periods | int }} goedkoopste periodes —
+                      entity_id: input_select.zendure_2400_ac_modus_selecteren
+                      name: " "
+            else:
+              - alias: >-
+                  Optimalisatie uit of de dag vastgezet met absolute handmatige periodes, wis
+                  het oplaadvermogen
+                  zodat Dynamisch Handelen terugvalt op het maximale oplaadvermogen
+                action: input_number.set_value
+                target:
+                  entity_id: input_number.dynamisch_oplaadvermogen
+                data:
+                  value: 0
         alias: Dynamisch omzetten van morgen naar vandaag
       - conditions:
           - condition: trigger
@@ -1779,15 +1888,26 @@ actions:
               minutes: 0
               seconds: 5
               milliseconds: 0
-          - action: rest_command.zendure_snel_laden
+          - alias: >-
+              Laad tijdens Dynamisch Handelen met het geoptimaliseerde oplaadvermogen, anders
+              met het maximale oplaadvermogen
+            action: rest_command.zendure_snel_laden
             data:
               sn: "{{ states('sensor.zendure_2400_ac_serienummer') }}"
               inputLimit: >-
-                {{ states('input_number.zendure_2400_ac_max_oplaadvermogen') |
-                int }}
+                {% set optimised = is_state('input_select.zendure_2400_ac_modus_selecteren', 'Dynamisch Handelen')
+                and is_state('input_boolean.dynamisch_oplaadvermogen_optimalisatie', 'on')
+                and states('input_number.dynamisch_oplaadvermogen') | float(0) > 0 %}
+                {{ states('input_number.dynamisch_oplaadvermogen') | int if optimised
+                else states('input_number.zendure_2400_ac_max_oplaadvermogen') | int }}
           - action: logbook.log
             data:
-              message: 💲Dynamisch goedkoop laden gestart —
+              message: >-
+                {% set optimised = is_state('input_select.zendure_2400_ac_modus_selecteren', 'Dynamisch Handelen')
+                and is_state('input_boolean.dynamisch_oplaadvermogen_optimalisatie', 'on')
+                and states('input_number.dynamisch_oplaadvermogen') | float(0) > 0 %}
+                💲Dynamisch goedkoop laden gestart op {{ states('input_number.dynamisch_oplaadvermogen') | int
+                if optimised else states('input_number.zendure_2400_ac_max_oplaadvermogen') | int }} watt —
               entity_id: input_select.zendure_2400_ac_modus_selecteren
               name: " "
           - wait_for_trigger:
