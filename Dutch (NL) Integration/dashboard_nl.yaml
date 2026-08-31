@@ -209,6 +209,8 @@ views:
                   format: HH:mm
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
@@ -538,6 +540,8 @@ views:
                   format: HH:mm:ss
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
@@ -948,6 +952,8 @@ views:
                 offsetX: 0
                 offsetY: 17
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1017,6 +1023,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1137,6 +1145,8 @@ views:
                         color-mix(in srgb, var(--primary-text-color) 75%,
                         transparent)
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1269,7 +1279,7 @@ views:
                 enabled: true
                 x:
                   format: HH:mm
-                  show: false
+                  show: true
                 "y":
                   formatter: |
                     EVAL: (val) => `${val.toFixed(3)} €/kWh`
@@ -1294,6 +1304,8 @@ views:
                         color-mix(in srgb, var(--primary-text-color) 75%,
                         transparent)
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1336,7 +1348,7 @@ views:
 
                     let prijs = item.value;
 
-                    if (item.duur === "ja") {
+                    if (item.duur === "ja" || item.overdracht === "D") {
                       prijs = prijs - correctie;
                     }
 
@@ -1346,7 +1358,13 @@ views:
                     let kleur = "rgba(224,224,227,1)";
 
 
-                    if (item.goedkoop === "ja") {
+                    if (item.overdracht === "G") {
+                      kleur = verleden ? "rgba(79,195,168,0.15)" : "rgba(79,195,168,1)";
+                    }
+                    else if (item.overdracht === "D") {
+                      kleur = verleden ? "rgba(224,128,116,0.15)" : "rgba(224,128,116,1)";
+                    }
+                    else if (item.goedkoop === "ja") {
                       kleur = verleden ? "rgba(1,161,128,0.15)" : "rgba(1,161,128,1)";
                     }
                     else if (item.duur === "ja") {
@@ -1402,6 +1420,13 @@ views:
                 name: Duurste Periodes Morgen
               - entity: input_text.dynamisch_handmatige_periode_morgen
                 name: Handmatige Periodes Morgen
+              - type: conditional
+                conditions:
+                  - entity: sensor.dynamisch_handmatige_periode_volgende_dag
+                    state_not: ""
+                row:
+                  entity: sensor.dynamisch_handmatige_periode_volgende_dag
+                  name: Handmatige Periodes Voor Morgen (berekend)
             visibility:
               - condition: time
                 after: "13:30:00"
@@ -1526,6 +1551,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1638,6 +1665,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1745,6 +1774,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -2032,6 +2063,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -2145,6 +2178,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -2364,6 +2399,8 @@ views:
                       format: dd-MM (HH:mm)
                       show: false
                   xaxis:
+                    tooltip:
+                      enabled: true
                     labels:
                       show: false
                       style:
@@ -2500,6 +2537,8 @@ views:
                   legend:
                     show: false
                   xaxis:
+                    tooltip:
+                      enabled: true
                     labels:
                       show: false
                     axisTicks:
@@ -2901,8 +2940,11 @@ views:
             content: >-
               <ha-alert alert-type="info">Helptekst</ha-alert>Heb je een
               dynamisch contract dan kun je hier de Nordpool HACS sensor
-              invullen en aangeven wat de minimale spread moet zijn om gebruik
-              te maken van het laden en ontladen op lage en hoge tarieven.
+              invullen, of een prijssensor van Frank Energie (de sensor met het
+              **prices** attribuut, bijvoorbeeld
+              **sensor.current_electricity_price**), en aangeven wat de
+              minimale spread moet zijn om gebruik te maken van het laden en
+              ontladen op lage en hoge tarieven.
 
 
               Heb je een 15 minuten contract vink dit dan aan zodat de grafieken

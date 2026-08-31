@@ -1,11 +1,23 @@
 #  Zendure Home Assistant Integratie
 
-![Preview](Images/NL-Dashboard-290526.gif) <br>
-<a href="https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/NL-%E2%80%90-Beschikbare-entiteiten">
-Ga naar de uitleg over alle entiteiten en het dashboard
-</a>
+### Wijzigingen ten opzichte van het [upstream-pakket](https://github.com/Gielz1986/Zendure-HA-zenSDK) van Gielz1986
+* accepteert Frank Energie-prijzen als bron voor dynamische prijzen, zonder dat Nordpool nodig is
+	* een veelgebruikte integratie, die bovendien [actief ontwikkeld](https://github.com/HiDiHo01/home-assistant-frank_energie/) wordt
+* alle P1-meters zijn verplaatst naar losse package-bestanden
+	* om de ervaring gelijk te trekken ongeacht de meter, en om te voorkomen dat de Home Assistant-logs worden volgespamd met duizenden meldingen
+	* upload het package dat bij jouw meter hoort, pas het IP-adres aan naar het juiste adres en vul de juiste entiteitsnaam in op het configuratietabblad van het dashboard
+* Modifier- en zoekvenstersyntaxis toegevoegd aan dynamische handmatige periodes
+	* je kunt de automatisch gevonden tijdvakken aanpassen door "+" of "-" vóór een bereik te zetten: "+D8:00-9:15;-G11:15", waardoor kleine aanpassingen aan de automatische tijdvakken VEEL eenvoudiger worden
+	* maakt zoeken mogelijk (beste uren, alleen duur, alleen goedkoop: Z/ZD/ZG) binnen willekeurige tijdsintervallen, ook over middernacht heen: om alleen tussen de middag en de volgende ochtend naar dure tijdvakken te zoeken, gebruik ik "ZD14:00-13:45V". Het achtervoegsel "V" betekent dat het blijft staan en niet om middernacht wordt verwijderd, wanneer de tijdvakken van de volgende dag naar vandaag worden gekopieerd
+	* de berekening van de spreiding gebeurt volgens het zoekcommando, niet uitsluitend binnen één dag
+	* tijdvakken die in de volgende dag worden gevonden, worden in een andere kleur weergegeven
+* De Nederlandse en de Global-versie weken van elkaar af; die zijn nu met elkaar in overeenstemming gebracht
+* Apexcharts heeft onlangs de standaardinstellingen gewijzigd, daarom heb ik de tooltips op de x-as expliciet ingeschakeld om [mijne Apexcharts](https://github.com/dewi-ny-je/apexcharts-card/) te kunnen gebruiken
 
-<br>
+![Preview](Images/NL-Dashboard-290526.gif)
+
+[Ga naar de uitleg over alle entiteiten en het dashboard](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/NL-%E2%80%90-Beschikbare-entiteiten)
+
 
 **Om in slechts 2️⃣ simpele stappen je batterij volledig lokaal werkend te krijgen in Home Assistant.**
 
@@ -35,6 +47,8 @@ Trakteer mij op een kopje koffie ☕️ en volg deze GitHub repository ⭐⭐⭐
 
 1. Zorg ervoor dat **HEMS is uitgeschakeld** in de Zendure-app.
 2. Plaats [Zendure_gielz1986_nl.yaml](./Dutch%20(NL)%20Integration/packages/zendure_gielz1986_nl.yaml) uit de map packages van GitHub in de map packages van Home Assistant. Mocht de map packages niet bestaan maak deze dan aan.
+2b. **Alleen als je een Homewizard P1 hebt**: plaats ook [zendure_gielz1986_homewizard_nl.yaml](./Dutch%20(NL)%20Integration/packages/zendure_gielz1986_homewizard_nl.yaml) in diezelfde map packages. Dit bestand voegt `sensor.homewizard_p1_vermogen` toe. Gebruik je een andere P1/CT-meter (`afwijkende_p1_sensor`)? Sla dit bestand dan over - het bevraagt de P1 elke seconde en vult anders je log met `Error fetching data: http:///api/v1/data failed with ...`.
+2c. **Gebruik je een andere P1/CT-meter?** Pak het bijbehorende package bestand uit [Energy Meters (Global & NL)](./Energy%20Meters%20(Global%20&%20NL)/README.md) - Homewizard API v1/v2, Zendure P1, Ecotracker P1, Zendure CT of Shelly Pro 3EM - zet het in dezelfde map packages, vervang daarin het `<IP-...>` voorbeeld en vul de sensor die het aanmaakt in bij `afwijkende_p1_sensor` hieronder. Plaats alleen het bestand van de meter die je hebt.
 3. Maak nu een **backup** van je `configuration.yaml`.
 4. Pas daarna je `configuration.yaml` aan door de onderstaande regel toe te voegen.
 
@@ -63,7 +77,7 @@ homeassistant:
 |-|-|
 | **Configuratie (Basis)** | **Informatie**|  
 | `zendure_2400_ac_ip_adres`       | **bijvoorbeeld 192.168.0.172** – In de Zendure app onder device Information. |  
-| `homewizard_p1_ip_adres`    | **(Instellingsadvies: gebruik een Homewizard P1) bijvoorbeeld 192.168.0.192** – In de Homewizard app (lokale API aanzetten).  |  
+| `homewizard_p1_ip_adres`    | **(Instellingsadvies: gebruik een Homewizard P1) bijvoorbeeld 192.168.0.192** – In de Homewizard app (lokale API aanzetten). Vereist het optionele package bestand `zendure_gielz1986_homewizard_nl.yaml` (zie stap 2b).  |  
 | `zendure_2400_ac_standby_vertraging` | **(Instellingsadvies: 15 minuten) 5-30 minuten** – Geef hier aan hoe snel de omvormer 100% in standby gaat bij 0 activiteit. Dit voorkomt sluipverbruik van +/- 19 watt. | 
 | `zendure_2400_ac_advies_instellingen_overnemen` | Zodra de batterij draait kun je met deze knop de onderstaande instellingsadviezen direct overnemen. | 
 | **Configuratie (Opladen)** |**Informatie**|  
@@ -79,12 +93,12 @@ homeassistant:
 | `zendure_2400_ac_minimaal_toegestaan_laadpercentage` | **(Instellingsadvies: 10%) 5% t/m 50%** – Geef hier het minimaal toegestaan laadpercentage aan. | 
 | `zendure_2400_ac_maximaal_toegestaan_laadpercentage` | **(Instellingsadvies: 100%) 70% t/m 100%** – Geef hier het maximaal toegestaan laadpercentage aan. Bij 100% vind er een SOC kalibratie plaats om het laadpercentage goed te kunnen inschatten. | 
 | **Configuratie (PV)** |**Informatie**|  
-| `zendure_2400_ac_pv_export_uitgeschakeld` | Vink dit aan om PV export uit te schakelen. Als de batterij vol is zal er niet langer energie geexporteerd worden van de verbonden zonnepanelen. | 
+| `zendure_2400_ac_pv_export_uitgeschakeld` | Vink dit aan om PV export uit te schakelen. Als de batterij vol is zal er niet langer energie geëxporteerd worden van de verbonden zonnepanelen. | 
 | **Configuratie (Optioneel)** |**Informatie**|  
-| `afwijkende_p1_sensor` | **bijvoorbeeld `sensor.eigen_P1`** – je eigen afwijkende P1 sensor toevoegen waarbij +watt afname is en -watt teruglevering (vul je hier je eigen sensor in dan is deze altijd leidend). [Ga naar WIKI](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-and-NL-%E2%80%90-P1-CT-meters-(API's))) voor afwijkende P1/CT API's. |  
+| `afwijkende_p1_sensor` | **bijvoorbeeld `sensor.eigen_P1`** – je eigen afwijkende P1 sensor toevoegen waarbij +watt afname is en -watt teruglevering (vul je hier je eigen sensor in dan is deze altijd leidend). Kant-en-klare package bestanden voor de Homewizard (API v1/v2), Zendure P1, Ecotracker, Zendure CT en Shelly Pro 3EM meters staan in [Energy Meters (Global & NL)](./Energy%20Meters%20(Global%20&%20NL)/README.md), zie stap 2c. Of [ga naar de WIKI](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-and-NL-%E2%80%90-P1-CT-meters-(API's))) voor de losse P1/CT API's. |  
 | `zendure_2400_ac_batterij_volgorde` | **bijvoorbeeld 1;5;3;4;2** – hiermee bepaal je zelf een afwijkende volgorde van de batterijen. De juiste volgorde bepaal je mede aan de hand van `sensor.zendure_2400_ac_batterij_serienummers` en de sticker op de batterij(en). Op deze manier zullen de batterijtemperaturen en het laadpercentage de juiste volgorde hebben zoals die van de batterij(en) in de stapel. | 
 | **Configuratie (Dynamisch)** |**Informatie**|  
-| `dynamisch_nordpool_sensor` | **bijvoorbeeld `sensor.nordpool_kwh_nl_eur_3_09_0`** – je eigen sensor van Nordpool (HACS) toevoegen. Wanneer je het Dynamisch Nordpool gedeelte in gebruik gaat nemen moet je voor dat je deze in gebruik neemt bij `dynamisch_handmatige_periode` en `dynamisch_handmatige_periode_morgen` even **unknown** weghalen. Hierna zal het dynamisch gedeelte werken. Alles wat in de forecast (morgen) gezet word zal overgenomen worden om 00:00 via de automatisering en verschijnen in vandaag. |  
+| `dynamisch_nordpool_sensor` | **bijvoorbeeld `sensor.nordpool_kwh_nl_eur_3_09_0`** – je eigen sensor van Nordpool (HACS) toevoegen. Ook een prijssensor van Frank Energie wordt ondersteund (de sensor met het `prices` attribuut, bijvoorbeeld **sensor.current_electricity_price**); de kwartierprijzen worden dan direct gebruikt, of per uur gemiddeld wanneer `dynamisch_15_minuten` uit staat. Wanneer je het Dynamisch Nordpool gedeelte in gebruik gaat nemen moet je voor dat je deze in gebruik neemt bij `dynamisch_handmatige_periode` en `dynamisch_handmatige_periode_morgen` even **unknown** weghalen. Hierna zal het dynamisch gedeelte werken. Alles wat in de forecast (morgen) gezet word zal overgenomen worden om 00:00 via de automatisering en verschijnen in vandaag. |  
 | `dynamisch_export_correctie` | Stel het aantal cent in dat tijdens het exporteren wordt afgetrokken. Deze waarde wordt gebruikt in de spreadberekening. |
 | `dynamisch_minimale_spread` | **bijvoorbeeld 25%** - Hiermee geef je aan vanaf hoeveel spread de batterij dynamisch gaat laden en opladen op hoog vermogen.  |  
 | `dynamisch_15_minuten` | Vink dit aan wanneer je gebruik wilt maken van 15 minuten periodes.  |  
@@ -121,6 +135,65 @@ Het moment is aangebroken: de batterij mag nu bewijzen dat hij meer is dan allee
 Ga naar de uitleg over alle verschillende modussen
 </a>
 
+
+---
+
+## 🕘 Dynamische handmatige periodes
+
+In de dynamische modussen zoekt de automatisering naar de goedkoopste en de duurste periodes van de dag. Een periode is één uur, of 15 minuten wanneer **Dynamisch 15 Minuten** aanstaat. Met **Dynamisch Handmatige Periode** (`input_text.dynamisch_handmatige_periode`) en **Dynamisch Handmatige Periode Morgen** (`input_text.dynamisch_handmatige_periode_morgen`) stuur je die zoekopdracht zelf. Onderdelen worden gescheiden door `;`, tijden schrijf je als `UU:MM` en hoofdletters maken niet uit.
+
+### 1. Vaste periodes — vervangt de automatische berekening
+
+| Voorbeeld | Betekenis |
+|-|-|
+| `G11:00` | 11:00 is een goedkope periode |
+| `D12:00` | 12:00 is een dure periode |
+| `G11:00-13:00` | 11:00 tot en met 13:00 zijn goedkope periodes |
+| `G11:00;D12:00;G15:00` | een combinatie van losse periodes |
+
+Zodra er één vaste periode in het veld staat, wordt de automatische berekening voor die dag volledig uitgezet: alleen de periodes die je zelf hebt opgegeven worden gebruikt.
+
+### 2. Aanpassingen `+` en `-` — past de automatische berekening aan
+
+Zet `+` of `-` vóór een onderdeel om het berekende resultaat aan te passen in plaats van te vervangen.
+
+| Voorbeeld | Betekenis |
+|-|-|
+| `+D02:00` | markeer 02:00 óók als duur |
+| `+G18:00-20:00` | markeer 18:00 tot en met 20:00 óók als goedkoop |
+| `-G03:00` | haal 03:00 weg bij de goedkope periodes |
+| `-D14:00-16:00` | haal 14:00 tot en met 16:00 weg bij de dure periodes |
+
+Een `+` wint altijd: een periode die als goedkoop berekend was, wordt met `+D` duur, en andersom. Een `-` verwijdert alleen een periode van het type dat je noemt, dus `-G` op een periode die in werkelijkheid duur is doet niets. Aanpassingen worden verwerkt in de volgorde waarin je ze opschrijft en werken ook samen met vaste periodes.
+
+### 3. Zoekvensters `Z`, `ZG` en `ZD`
+
+Standaard zoekt de automatisering binnen de dag zelf. Met een zoekvenster bepaal je waar er gezocht mag worden. Een zoekvenster gebruikt altijd een **tijdbereik** (losse periodes mogen niet) en moet vooraan in het tekstveld staan. Meerdere vensters mogen gecombineerd worden; er wordt dan in alle vensters gezocht.
+
+| Voorbeeld | Betekenis |
+|-|-|
+| `Z10:00-16:00` | zoek goedkope *én* dure periodes tussen 10:00 en 16:00 |
+| `ZG22:00-06:00` | zoek goedkope periodes van 22:00 tot 06:00 de volgende dag |
+| `ZD14:00-13:00` | zoek dure periodes van 14:00 tot 13:00 de volgende dag |
+| `+Z10:00-13:00` | zoek van vandaag 10:00 tot morgen 13:00 |
+
+Het venster loopt door naar de volgende dag wanneer de eindtijd kleiner is dan of gelijk is aan de begintijd, of wanneer je een `+` vóór het venster zet. Daarmee is het mogelijk om de echte nachtpiek te vinden, die anders om middernacht in tweeën valt. Zolang de prijzen van morgen nog niet bekend zijn — en altijd bij **Dynamisch Handmatige Periode Morgen** — stopt het zoeken gewoon bij het einde van de beschikbare prijzen.
+
+Zet er een `V` (vast) achter om een venster te behouden wanneer om middernacht de instellingen van morgen naar vandaag gaan, bijvoorbeeld `ZD14:00-13:00V`.
+
+> Zoekvensters sturen alleen de automatische berekening. Staat er in hetzelfde veld ook een vaste periode (hoofdstuk 1), dan staat de berekening uit en heeft het venster geen effect.
+
+**Dynamisch Spread Indicatie NOM** volgt het venster. De sensor vergelijkt de goedkope periodes van het plan met de dure periodes die *na* de eerste goedkope periode liggen, en telt daarbij ook de periodes mee die een meerdaags venster op de volgende dag heeft gekozen; die krijgen het achtervoegsel `(+1)`. Dure periodes vóór de eerste goedkope periode blijven buiten beschouwing — dat is nu juist wat deze sensor meet, en het is de waarde waarop de dynamische laadautomatisering controleert tegen **Dynamisch Minimale Spread**.
+
+### 4. Wat er om middernacht gebeurt
+
+Vlak vóór middernacht berekent de automatisering de handmatige periode voor de nieuwe dag en toont die in **Dynamisch Handmatige Periode Volgende Dag**. Om 00:00 wordt die waarde in **Dynamisch Handmatige Periode** gezet:
+
+* de onderdelen van **Dynamisch Handmatige Periode Morgen** worden overgenomen;
+* een venster met `V` uit het veld van vandaag blijft staan en vervangt het venster van hetzelfde type (`Z`, `ZG` of `ZD`) dat van morgen komt;
+* elke periode van morgen die door het meerdaagse zoekvenster van vandaag gekozen is, wordt als aanpassing toegevoegd, bijvoorbeeld `+G00:00-02:00;+D09:00`, zodat een plan dat over middernacht heen gemaakt is ook echt uitgevoerd wordt.
+
+Die overgedragen periodes worden op de grafiek **Dynamisch Morgen** in een lichtere tint van dezelfde kleur getekend, omdat ze uit het plan van vandaag komen en niet uit de eigen berekening van morgen. Een periode die door beide gekozen is, krijgt de lichtere tint: het venster van vandaag is wat om middernacht daadwerkelijk in het veld terechtkomt.
 
 ---
 

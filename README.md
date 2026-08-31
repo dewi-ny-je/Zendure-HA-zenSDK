@@ -1,14 +1,30 @@
+
 # Zendure Home Assistant Integration
 Choose your preferred language
 
  [![English 🌍 Global](https://img.shields.io/badge/English-Global-blue?style=for-the-badge)](README.md) [![Dutch 🇳🇱 NL](https://img.shields.io/badge/Dutch-NL-orange?style=for-the-badge)](README.nl.md)<br><br>
+
+
+### Changes over the [upstream package](https://github.com/Gielz1986/Zendure-HA-zenSDK) by Gielz1986
+* accept Frank Energie prices as dynamic price source, without requiring Nordpool
+	* a very common integration, also [actively developed](https://github.com/HiDiHo01/home-assistant-frank_energie/) 
+* all P1 meters are moved to independent package files
+	* to unify experience no matter the meter, and to avoid spamming the Home Assistant logs with thousands of messages
+	* upload the package corresponding to your meter, edit the IP to the correct one, introduce the correct entity name in the configuration tab of the dashboard
+* Add modifier and search-window syntax to dynamic manual periods
+	* you can modify the automatically found timeslots by using "+" or "-" in front of a range: "+D8:00-9:15;-G11:15", and it  makes applying minor changes to the automatic timeslots WAY easier
+	* allows searching (best hours, only expensive, only cheap: Z/ZD/ZG) in arbitrary time intervals, also crossing a midnight boundary: to search expensive timeslots only between afternoon and next morning, I use "ZD14:00-13:45V". The suffix "V" means that it's going to stay and it won't be removed at midnight, when next day's timeslots are copied into today's timeslots
+	* calculation od spread is performed according to the search command, not exclusively within a day
+	* timeslots found in the next day are plotted in a different colour
+* Dutch and Global version has discrepancies, now they have been brought in agreement
+* Apexcharts recently changed default settings, so I made x-axis tooltips explicitly active, so I can use my more modern [apexcharts-card integration](https://github.com/dewi-ny-je/apexcharts-card)
+
+The additional features introduced are copyrighted by @dewi-ny-je, the original features are copyrighted by @Gielz1986
+
 ![Preview](Images/Global-Dashboard-290526.gif)
-<a href="https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-%E2%80%90-Available-entities">
-Go to the explanation of all entities and the dashboard
-</a>
 
+[Go to the explanation of all entities and the dashboard](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-%E2%80%90-Available-entities)
 
-<br>
 
 **Get your battery running locally in Home Assistant in just 2️⃣ simple steps.**
 
@@ -38,6 +54,8 @@ Buy me a coffee ☕️ and follow this GitHub repository ⭐⭐⭐.
 
 1. Make sure **HEMS is disabled** in the Zendure app.
 2. Place [Zendure_gielz1986_global.yaml](./Global%20(EN)%20Integration/packages/zendure_gielz1986_global.yaml) from the GitHub packages folder into your Home Assistant `packages` folder. If it does not exist, create it.
+2b. **Only if you own a Homewizard P1**: also place [zendure_gielz1986_homewizard_global.yaml](./Global%20(EN)%20Integration/packages/zendure_gielz1986_homewizard_global.yaml) in that same `packages` folder. It adds `sensor.homewizard_p1_power`. Using a different home energy meter (`home_energy_setting_meter_sensor`)? Then skip this file - it polls the P1 every second and would otherwise fill your log with `Error fetching data: http:///api/v1/data failed with ...`.
+2c. **Using another P1/CT meter?** Take the matching package file from [Energy Meters (Global & NL)](./Energy%20Meters%20(Global%20&%20NL)/README.md) - Homewizard API v1/v2, Zendure P1, Ecotracker P1, Zendure CT or Shelly Pro 3EM - put it in the same `packages` folder, replace the `<IP-...>` placeholder in it and then fill in the sensor it creates at `home_energy_setting_meter_sensor` below. Install only the file for the meter you own.
 3. Create a **backup** of your `configuration.yaml`.
 4. Then edit your `configuration.yaml` and add the following:
 
@@ -66,7 +84,7 @@ homeassistant:
 |-|-|
 | **Configuration (Basic)** | **Information** |
 | `zendure_setting_ip_address` | **e.g. 192.168.0.172** – Found in the Zendure app under device information. |
-| `homewizard_setting_p1_ip_address` | **e.g. 192.168.0.192** – Enable local API in the Homewizard app |
+| `homewizard_setting_p1_ip_address` | **e.g. 192.168.0.192** – Enable local API in the Homewizard app. Requires the optional package file `zendure_gielz1986_homewizard_global.yaml` (see step 2b). |
 | `zendure_setting_standby_delay` | **(Recommended: 15 minutes) 5–30 minutes** – Defines how quickly the inverter goes into full standby at 0 activity. Prevents ~19W idle consumption. |
 | `zendure_setting_set_default_settings` | Once the battery is running, you can use this to apply the recommended settings below. |
 | **Configuration (Charging)** | **Information** |
@@ -84,10 +102,10 @@ homeassistant:
 | **Configuration (PV)** |**Information**|  
 | `zendure_setting_pv_export_disabled`    | Check this to disable the pv export. When the battery is full it will no longer export the energy of connected solarpanels. | 
 | **Configuration (Optional)** | **Information** |
-| `home_energy_setting_meter_sensor` | **e.g. sensor.custom_energy** – Add your own home energy sensor (+watt import / -watt export). This will take priority. [Go to WIKI](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-and-NL-%E2%80%90-P1-CT-meters-(API's))) for P1/CT API's. |
+| `home_energy_setting_meter_sensor` | **e.g. sensor.custom_energy** – Add your own home energy sensor (+watt import / -watt export). This will take priority. Ready-made package files for the Homewizard (API v1/v2), Zendure P1, Ecotracker, Zendure CT and Shelly Pro 3EM meters are in [Energy Meters (Global & NL)](./Energy%20Meters%20(Global%20&%20NL)/README.md), see step 2c. Or [Go to WIKI](https://github.com/Gielz1986/Zendure-HA-zenSDK/wiki/Global-and-NL-%E2%80%90-P1-CT-meters-(API's))) for the raw P1/CT API's. |
 | `zendure_setting_battery_order` | **e.g. 1;5;3;4;2** – Manually define battery order based on serial numbers and physical stacking. |
 | **Configuration (Dynamic)** | **Information** |
-| `dynamic_setting_nordpool_sensor` | **e.g. sensor.nordpool_kwh_nl_eur_3_09_0** – Your Nordpool (HACS) sensor. |
+| `dynamic_setting_nordpool_sensor` | **e.g. sensor.nordpool_kwh_nl_eur_3_09_0** – Your Nordpool (HACS) sensor. A Frank Energie price sensor (the one with the `prices` attribute, e.g. **sensor.current_electricity_price**) is also supported; its 15-minute prices are used as-is, or averaged per hour when `dynamic_setting_15_minute_interval` is off. |
 | `dynamic_export_correction` | Specify how many cents should be subtracted during export. This value is used in the spread calculation. |
 | `dynamic_setting_minimal_spread` | **e.g. 25%** – Minimum price spread before dynamic charging/discharging activates. |
 | `dynamic_setting_15_minute_interval` | Enable this if you want to use 15-minute intervals. |
@@ -128,6 +146,65 @@ The moment has arrived: time for your battery to prove it’s more than just an 
 Go to the explanation of all modes
 </a>
 
+
+---
+
+## 🕘 Dynamic Manual Periods
+
+In the dynamic modes the automation searches for the cheapest and the most expensive periods of the day. A period is one hour, or 15 minutes when **Dynamic 15 Minute Interval** is switched on. With **Dynamic Manual Period** (`input_text.dynamic_manual_period`) and **Dynamic Manual Period Tomorrow** (`input_text.dynamic_manual_period_tomorrow`) you steer that search yourself. Entries are separated by `;`, times are written as `HH:MM`, and the input is not case sensitive.
+
+### 1. Fixed periods — replaces the automatic search
+
+| Example | Meaning |
+|-|-|
+| `G11:00` | 11:00 is a cheap period |
+| `D12:00` | 12:00 is an expensive period |
+| `G11:00-13:00` | 11:00 up to and including 13:00 are cheap periods |
+| `G11:00;D12:00;G15:00` | a combination of single periods |
+
+As soon as one fixed entry is present, the automatic search is switched off completely for that day: only the periods you listed yourself are used.
+
+### 2. Modifiers `+` and `-` — adjusts the automatic search
+
+Put `+` or `-` in front of an entry to change the calculated result instead of replacing it.
+
+| Example | Meaning |
+|-|-|
+| `+D02:00` | mark 02:00 as expensive as well |
+| `+G18:00-20:00` | mark 18:00 up to and including 20:00 as cheap as well |
+| `-G03:00` | remove 03:00 from the cheap periods |
+| `-D14:00-16:00` | remove 14:00 up to and including 16:00 from the expensive periods |
+
+A `+` always wins: a period that was calculated as cheap becomes expensive with `+D`, and the other way round. A `-` only removes a period of the type you mention, so `-G` on a period that is in fact expensive does nothing. Modifiers are applied in the order in which you write them, and they also work together with fixed periods.
+
+### 3. Search windows `Z`, `ZG` and `ZD`
+
+By default the search runs over the day itself. With a search window you decide where the automation is allowed to look. A search window always uses a time **range** (single periods are not allowed) and has to be placed at the beginning of the text field. Several windows may be combined; the automation then searches in all of them.
+
+| Example | Meaning |
+|-|-|
+| `Z10:00-16:00` | search cheap *and* expensive periods between 10:00 and 16:00 |
+| `ZG22:00-06:00` | search cheap periods from 22:00 until 06:00 the next day |
+| `ZD14:00-13:00` | search expensive periods from 14:00 until 13:00 the next day |
+| `+Z10:00-13:00` | search from 10:00 today until 13:00 tomorrow |
+
+The window runs into the next day when the end time is smaller than or equal to the start time, or when you put a `+` in front of the window. That is what makes it possible to find the real night peak, which otherwise falls apart at midnight. As long as tomorrow's prices have not been published yet — and always for **Dynamic Manual Period Tomorrow** — the search simply stops at the end of the available prices.
+
+Add `V` (*vast*, fixed) to keep a window when the settings of tomorrow move into today at midnight, for example `ZD14:00-13:00V`.
+
+> Search windows only steer the automatic search. If the same field also contains a fixed period (chapter 1) the automatic search is off, and the window has no effect.
+
+**Dynamic Spread Indication DSC** follows the window. It compares the cheap periods of the plan against the expensive periods that come *after* the first cheap one, and counts the periods a multi-day window picked up on the next day as well; those are shown with a `(+1)` suffix. Expensive periods lying before the first cheap period stay excluded — that is what this sensor measures, and it is the value the dynamic charging automation checks against **Dynamic Minimal Spread**.
+
+### 4. What happens at midnight
+
+Shortly before midnight the automation calculates the manual period for the new day and shows it in **Dynamic Next Day Manual Period**. At 00:00 that value is written into **Dynamic Manual Period**:
+
+* the entries of **Dynamic Manual Period Tomorrow** are taken over;
+* a window marked with `V` in today's field is kept and replaces the window of the same type (`Z`, `ZG` or `ZD`) that came from tomorrow;
+* every period of tomorrow that was selected by today's multi-day search window is added as a modifier, for example `+G00:00-02:00;+D09:00`, so that a plan made across midnight is really carried out.
+
+Those carried periods are drawn on the **Dynamic Tomorrow** chart in a lighter tone of the same colour, because they come from today's plan and not from tomorrow's own calculation. A period claimed by both is drawn in the lighter tone: today's window is what actually ends up in the field at midnight.
 
 ---
 
