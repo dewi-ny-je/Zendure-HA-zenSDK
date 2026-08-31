@@ -44,6 +44,11 @@ triggers:
     id: modus_dynamisch_spread
   - trigger: state
     entity_id:
+      - input_boolean.dynamic_setting_charge_power_optimisation
+      - input_text.dynamic_manual_period
+    id: dynamic_charge_power_optimisation
+  - trigger: state
+    entity_id:
       - input_number.zendure_setting_max_charge_power
     id: systeem_instelling_maxoplaadvermogen
   - trigger: state
@@ -1418,6 +1423,7 @@ actions:
           - condition: trigger
             id:
               - dynamisch_middernacht
+              - dynamic_charge_power_optimisation
           - condition: template
             value_template: >-
               {{
@@ -1425,46 +1431,46 @@ actions:
               }}
             alias: input_text.dynamic_setting_nordpool_sensor is gevuld
         sequence:
-          - alias: Zet goedkoopste periode van morgen naar vandaag
-            target:
-              entity_id: input_number.dynamic_lowest_price_x_period
-            data:
-              value: >-
-                {{ states('input_number.dynamic_lowest_price_x_period_tomorrow')
-                | float }}
-            action: input_number.set_value
-          - alias: Zet duurste periode van morgen naar vandaag
-            target:
-              entity_id: input_number.dynamic_highest_price_x_period
-            data:
-              value: >-
-                {{
-                states('input_number.dynamic_highest_price_x_period_tomorrow') |
-                float }}
-            action: input_number.set_value
-          - alias: Zet handmatige periode van morgen naar vandaag
-            target:
-              entity_id: input_text.dynamic_manual_period
-            data:
-              value: "{{ states('input_text.dynamic_manual_period_tomorrow') }}"
-            action: input_text.set_value
-          - alias: Reset handmatige periode van morgen
-            target:
-              entity_id: input_text.dynamic_manual_period_tomorrow
-            data:
-              value: ""
-            action: input_text.set_value
-          - action: logbook.log
-            data:
-              message: ⚙️Dynamic period settings copied from tomorrow to today —
-              entity_id: input_select.zendure_operation_mode
-              name: " "
-          - alias: Wait until today's dynamic prices are available
-            wait_template: >-
-              {% set p = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
-              {{ p | count >= 11 and (p[0]['start'] | as_datetime | as_local).date() == now().date() }}
-            timeout: "00:10:00"
-            continue_on_timeout: true
+          - alias: Copy tomorrow's dynamic settings into today, at midnight only
+            if:
+              - condition: trigger
+                id:
+                  - dynamisch_middernacht
+            then:
+              - alias: Zet goedkoopste periode van morgen naar vandaag
+                target:
+                  entity_id: input_number.dynamic_lowest_price_x_period
+                data:
+                  value: >-
+                    {{ states('input_number.dynamic_lowest_price_x_period_tomorrow')
+                    | float }}
+                action: input_number.set_value
+              - alias: Zet duurste periode van morgen naar vandaag
+                target:
+                  entity_id: input_number.dynamic_highest_price_x_period
+                data:
+                  value: >-
+                    {{
+                    states('input_number.dynamic_highest_price_x_period_tomorrow') |
+                    float }}
+                action: input_number.set_value
+              - alias: Zet handmatige periode van morgen naar vandaag
+                target:
+                  entity_id: input_text.dynamic_manual_period
+                data:
+                  value: "{{ states('input_text.dynamic_manual_period_tomorrow') }}"
+                action: input_text.set_value
+              - alias: Reset handmatige periode van morgen
+                target:
+                  entity_id: input_text.dynamic_manual_period_tomorrow
+                data:
+                  value: ""
+                action: input_text.set_value
+              - action: logbook.log
+                data:
+                  message: ⚙️Dynamic period settings copied from tomorrow to today —
+                  entity_id: input_select.zendure_operation_mode
+                  name: " "
           - alias: Optimise the number of cheapest periods and the dynamic charge power
             if:
               - alias: Charge power optimisation is enabled
@@ -1475,55 +1481,82 @@ actions:
                 condition: template
                 value_template: >-
                   {{ states('input_text.dynamic_manual_period') | length == 0 }}
-              - alias: Today's prices are available
-                condition: template
-                value_template: >-
+            then:
+              - alias: Wait until today's dynamic prices are available
+                wait_template: >-
                   {% set p = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
                   {{ p | count >= 11 and (p[0]['start'] | as_datetime | as_local).date() == now().date() }}
-            then:
+                timeout: "00:10:00"
+                continue_on_timeout: true
+              - alias: Apply the optimisation once today's prices are available
+                if:
+                  - alias: Today's prices are available
+                    condition: template
+                    value_template: >-
+                      {% set p = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
+                      {{ p | count >= 11 and (p[0]['start'] | as_datetime | as_local).date() == now().date() }}
+                else:
+                  - alias: >-
+                      No prices for today, clear the charge power so Dynamic Trading falls back
+                      to the maximum charge power
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamic_charge_power
+                    data:
+                      value: 0
+                then:
+                  - alias: >-
+                      Widen the cheapest periods from 11 up to 23 and keep the last count whose
+                      average price stays within 2% of the average over the 11 cheapest periods
+                    variables:
+                      optimal_periods: >-
+                        {% set prijzen = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
+                        {% set waarden = prijzen | map(attribute='value') | map('float') | sort | list %}
+                        {% set basis = (waarden[:11] | sum) / 11 %}
+                        {% set drempel = 0.02 * (basis | abs) %}
+                        {% set maxn = [23, waarden | count] | min %}
+                        {% set ns = namespace(gekozen=maxn, gevonden=false) %}
+                        {% for x in range(12, maxn + 1) %}
+                        {% if not ns.gevonden and ((waarden[:x] | sum) / x - basis) > drempel %}
+                        {% set ns.gekozen = x - 1 %}
+                        {% set ns.gevonden = true %}
+                        {% endif %}
+                        {% endfor %}
+                        {{ ns.gekozen }}
+                  - alias: Charge power from y = 6.3131x² - 341.16x + 6002.5, capped at the maximum charge power
+                    variables:
+                      optimal_power: >-
+                        {% set x = optimal_periods | int %}
+                        {{ [ (6.3131 * x * x - 341.16 * x + 6002.5) | round(0) | int,
+                        states('input_number.zendure_setting_max_charge_power') | int(12000) ] | min }}
+                  - alias: Set the optimised number of cheapest periods for today
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamic_lowest_price_x_period
+                    data:
+                      value: "{{ optimal_periods | int }}"
+                  - alias: Set the dynamic charge power for today
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamic_charge_power
+                    data:
+                      value: "{{ optimal_power | int }}"
+                  - action: logbook.log
+                    data:
+                      message: >-
+                        ⚙️Dynamic charge power optimised to {{ optimal_power | int }} watt over the
+                        {{ optimal_periods | int }} cheapest periods —
+                      entity_id: input_select.zendure_operation_mode
+                      name: " "
+            else:
               - alias: >-
-                  Widen the cheapest periods from 11 up to 23 and keep the last count whose
-                  average price stays within 2% of the average over the 11 cheapest periods
-                variables:
-                  optimal_periods: >-
-                    {% set prijzen = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
-                    {% set waarden = prijzen | map(attribute='value') | map('float') | sort | list %}
-                    {% set basis = (waarden[:11] | sum) / 11 %}
-                    {% set drempel = 0.02 * (basis | abs) %}
-                    {% set maxn = [23, waarden | count] | min %}
-                    {% set ns = namespace(gekozen=maxn, gevonden=false) %}
-                    {% for x in range(12, maxn + 1) %}
-                    {% if not ns.gevonden and ((waarden[:x] | sum) / x - basis) > drempel %}
-                    {% set ns.gekozen = x - 1 %}
-                    {% set ns.gevonden = true %}
-                    {% endif %}
-                    {% endfor %}
-                    {{ ns.gekozen }}
-              - alias: Charge power from y = 6.3131x² - 341.16x + 6002.5, capped at the maximum charge power
-                variables:
-                  optimal_power: >-
-                    {% set x = optimal_periods | int %}
-                    {{ [ (6.3131 * x * x - 341.16 * x + 6002.5) | round(0) | int,
-                    states('input_number.zendure_setting_max_charge_power') | int(12000) ] | min }}
-              - alias: Set the optimised number of cheapest periods for today
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamic_lowest_price_x_period
-                data:
-                  value: "{{ optimal_periods | int }}"
-              - alias: Set the dynamic charge power for today
+                  Optimisation disabled or manual periods in use, clear the charge power so
+                  Dynamic Trading falls back to the maximum charge power
                 action: input_number.set_value
                 target:
                   entity_id: input_number.dynamic_charge_power
                 data:
-                  value: "{{ optimal_power | int }}"
-              - action: logbook.log
-                data:
-                  message: >-
-                    ⚙️Dynamic charge power optimised to {{ optimal_power | int }} watt over the
-                    {{ optimal_periods | int }} cheapest periods —
-                  entity_id: input_select.zendure_operation_mode
-                  name: " "
+                  value: 0
         alias: Set dynamic manual periods from tomorrow into today
       - conditions:
           - condition: trigger
