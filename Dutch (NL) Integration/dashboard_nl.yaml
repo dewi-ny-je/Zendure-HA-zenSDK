@@ -197,6 +197,8 @@ views:
                   format: HH:mm
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
@@ -526,6 +528,8 @@ views:
                   format: HH:mm:ss
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
@@ -936,6 +940,8 @@ views:
                 offsetX: 0
                 offsetY: 17
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1005,6 +1011,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1529,6 +1537,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1641,6 +1651,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1748,6 +1760,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -2035,6 +2049,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -2148,6 +2164,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -2367,6 +2385,8 @@ views:
                       format: dd-MM (HH:mm)
                       show: false
                   xaxis:
+                    tooltip:
+                      enabled: true
                     labels:
                       show: false
                       style:
@@ -2503,6 +2523,8 @@ views:
                   legend:
                     show: false
                   xaxis:
+                    tooltip:
+                      enabled: true
                     labels:
                       show: false
                     axisTicks:

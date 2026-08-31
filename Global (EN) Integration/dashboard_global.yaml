@@ -7,7 +7,7 @@ views:
       - type: grid
         cards:
           - type: heading
-            icon: ""
+            icon: ''
             heading_style: title
             badges:
               - type: entity
@@ -16,14 +16,14 @@ views:
                 entity: sensor.zendure_power
                 tap_action:
                   action: more-info
-                color: "#01a180"
+                color: '#01a180'
               - type: entity
                 show_state: true
                 show_icon: true
                 entity: sensor.zendure_power_offgrid_outlet_1
                 tap_action:
                   action: more-info
-                color: "#01a180"
+                color: '#01a180'
                 visibility:
                   - condition: state
                     entity: sensor.zendure_offgrid_mode
@@ -35,7 +35,7 @@ views:
                 show_state: true
                 show_icon: true
                 entity: sensor.zendure_total_state_of_charge
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
               - type: entity
@@ -43,7 +43,7 @@ views:
                 show_icon: true
                 entity: sensor.zendure_relay_switches_today
                 icon: mdi:swap-vertical-bold
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
             heading: Battery
@@ -58,7 +58,7 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: entities
             entities:
               - entity: input_select.zendure_operation_mode
@@ -103,7 +103,7 @@ views:
             header:
               show: true
               show_states: true
-              title: ""
+              title: ''
             graph_span: 1d
             span:
               start: day
@@ -119,7 +119,7 @@ views:
                 stroke_width: 2
                 opacity: 0.35
                 extend_to: now
-                color: "#01a180"
+                color: '#01a180'
                 float_precision: 0
                 color_threshold:
                   - value: -2000
@@ -167,7 +167,7 @@ views:
                 stroke_width: 0
                 opacity: 0.3
                 extend_to: now
-                color: "#c0c0c2"
+                color: '#c0c0c2'
                 float_precision: 0
                 yaxis_id: energy
                 show:
@@ -197,6 +197,8 @@ views:
                   format: HH:mm
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
@@ -207,7 +209,7 @@ views:
                   color: color-mix(in srgb, var(--divider-color) 50%, transparent)
               yaxis:
                 - title:
-                    text: ""
+                    text: ''
                   decimalsInFloat: 0
                   labels:
                     style:
@@ -282,7 +284,7 @@ views:
             header:
               show: true
               show_states: true
-              title: ""
+              title: ''
             graph_span: 1d
             span:
               start: day
@@ -298,7 +300,7 @@ views:
                 stroke_width: 2
                 opacity: 0.35
                 extend_to: now
-                color: "#01a180"
+                color: '#01a180'
                 float_precision: 0
                 color_threshold:
                   - value: -2000
@@ -346,7 +348,7 @@ views:
                 stroke_width: 0
                 opacity: 0.3
                 extend_to: now
-                color: "#c0c0c2"
+                color: '#c0c0c2'
                 float_precision: 0
                 yaxis_id: energy
                 show:
@@ -376,6 +378,8 @@ views:
                   format: HH:mm
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
@@ -386,7 +390,7 @@ views:
                   color: color-mix(in srgb, var(--divider-color) 50%, transparent)
               yaxis:
                 - title:
-                    text: ""
+                    text: ''
                   decimalsInFloat: 0
                   labels:
                     style:
@@ -442,7 +446,7 @@ views:
             header:
               show: true
               show_states: true
-              title: ""
+              title: ''
             graph_span: 10min
             series:
               - entity: sensor.zendure_power
@@ -452,11 +456,11 @@ views:
                   duration: 5sec
                 type: area
                 transform: return -x;
-                offset: "-5s"
+                offset: -5s
                 stroke_width: 2
                 opacity: 0.35
                 extend_to: now
-                color: "#01a180"
+                color: '#01a180'
                 float_precision: 0
                 color_threshold:
                   - value: -2000
@@ -496,7 +500,7 @@ views:
                   offset_in_name: false
               - entity: sensor.home_energy_meter_target
                 name: Home Energy Meter
-                offset: "-5s"
+                offset: -5s
                 group_by:
                   func: avg
                   duration: 5sec
@@ -504,7 +508,7 @@ views:
                 stroke_width: 0
                 opacity: 0.3
                 extend_to: now
-                color: "#c0c0c2"
+                color: '#c0c0c2'
                 float_precision: 0
                 yaxis_id: energy
                 show:
@@ -526,6 +530,8 @@ views:
                   format: HH:mm:ss
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
@@ -536,7 +542,7 @@ views:
                   color: color-mix(in srgb, var(--divider-color) 50%, transparent)
               yaxis:
                 - title:
-                    text: ""
+                    text: ''
                   decimalsInFloat: 0
                   labels:
                     style:
@@ -568,7 +574,7 @@ views:
                 hover:
                   size: 0
           - type: heading
-            icon: ""
+            icon: ''
             heading: PV
             heading_style: title
             badges:
@@ -613,7 +619,7 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_pv
-                state: "on"
+                state: 'on'
           - type: custom:apexcharts-card
             experimental:
               hidden_by_default: true
@@ -643,7 +649,7 @@ views:
             header:
               show: true
               show_states: true
-              title: ""
+              title: ''
             graph_span: 1d
             span:
               start: day
@@ -692,7 +698,7 @@ views:
                 opacity: 0
                 stroke_width: 0
                 extend_to: now
-                color: "#01a180"
+                color: '#01a180'
                 float_precision: 0
                 yaxis_id: energy
                 show:
@@ -709,7 +715,7 @@ views:
                 opacity: 0.35
                 stroke_width: 0
                 extend_to: now
-                color: "#c0c0c2"
+                color: '#c0c0c2'
                 float_precision: 0
                 yaxis_id: energy
                 show:
@@ -733,7 +739,7 @@ views:
               yaxis:
                 - min: 0
                   title:
-                    text: ""
+                    text: ''
                   decimalsInFloat: 0
                   labels:
                     style:
@@ -765,11 +771,11 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_pv
-                state: "on"
+                state: 'on'
       - type: grid
         cards:
           - type: heading
-            icon: ""
+            icon: ''
             heading_style: title
             heading: Control
             badges:
@@ -778,7 +784,7 @@ views:
                 show_icon: true
                 entity: sensor.home_energy_meter_power
                 state_content: state
-                color: "#01a180"
+                color: '#01a180'
                 icon: mdi:home
                 tap_action:
                   action: more-info
@@ -842,7 +848,7 @@ views:
                   entity: sensor.zendure_set_charge_power
                   name: Charge Power
           - type: heading
-            icon: ""
+            icon: ''
             heading: Zero Import
             heading_style: title
             badges:
@@ -850,7 +856,7 @@ views:
                 show_state: true
                 show_icon: true
                 entity: sensor.home_energy_zero_import_duration_today
-                color: "#01a180"
+                color: '#01a180'
                 icon: mdi:leaf
                 tap_action:
                   action: more-info
@@ -873,17 +879,17 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: custom:apexcharts-card
             experimental:
               hidden_by_default: true
             header:
               show: true
-              title: ""
+              title: ''
             graph_span: 2month
             span:
               start: month
-              offset: "-1month"
+              offset: -1month
             cache: false
             yaxis:
               - min: ~200
@@ -908,7 +914,7 @@ views:
                 x:
                   format: d/MM
                   show: false
-                "y":
+                'y':
                   formatter: |
                     EVAL:function(value) {
                       const h = Math.floor(value);
@@ -932,6 +938,8 @@ views:
                 offsetX: 0
                 offsetY: 17
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -946,12 +954,12 @@ views:
                   type: max
                   align: start
                 type: column
-                color: "#01a180"
+                color: '#01a180'
                 show:
                   in_header: false
                   in_legend: false
           - type: heading
-            icon: ""
+            icon: ''
             heading_style: title
             heading: Import | Export
             badges:
@@ -963,18 +971,18 @@ views:
                 state_content:
                   - name
                   - state
-                color: "#01a180"
+                color: '#01a180'
                 icon: mdi:percent
                 tap_action:
                   action: more-info
           - type: custom:apexcharts-card
             header:
               show: true
-              title: ""
+              title: ''
             graph_span: 24month
             span:
               start: month
-              offset: "-23month"
+              offset: -23month
             cache: false
             apex_config:
               yaxis:
@@ -1001,6 +1009,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1015,7 +1025,7 @@ views:
                   type: change
                   align: start
                 type: column
-                color: "#01a180"
+                color: '#01a180'
                 show:
                   in_header: false
               - entity: sensor.zendure_energy_export
@@ -1025,7 +1035,7 @@ views:
                   type: change
                   align: start
                 type: column
-                color: "#a2a2a3"
+                color: '#a2a2a3'
                 show:
                   in_header: false
           - type: entities
@@ -1037,7 +1047,7 @@ views:
       - type: grid
         cards:
           - type: heading
-            icon: ""
+            icon: ''
             heading: Dynamic Today
             heading_style: title
             badges:
@@ -1045,7 +1055,7 @@ views:
                 show_state: true
                 show_icon: true
                 entity: sensor.dynamic_nordpool
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
               - type: entity
@@ -1053,27 +1063,27 @@ views:
                 show_icon: true
                 entity: sensor.dynamic_lowest_price_period
                 icon: mdi:arrow-down-bold
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
                 visibility:
                   - condition: state
                     entity: sensor.dynamic_lowest_price_period
-                    state: "Yes"
+                    state: 'Yes'
                 name: Cheap
                 state_content: name
               - type: entity
                 show_state: true
                 show_icon: true
                 entity: sensor.dynamic_highest_price_period
-                color: "#c53b2c"
+                color: '#c53b2c'
                 icon: mdi:arrow-up-bold
                 tap_action:
                   action: more-info
                 visibility:
                   - condition: state
                     entity: sensor.dynamic_highest_price_period
-                    state: "Yes"
+                    state: 'Yes'
                 name: Expensive
                 state_content: name
           - type: custom:apexcharts-card
@@ -1097,7 +1107,7 @@ views:
                 x:
                   format: HH:mm
                   show: false
-                "y":
+                'y':
                   formatter: |
                     EVAL: (val) => `${val.toFixed(3)} €/kWh`
               grid:
@@ -1112,7 +1122,7 @@ views:
                 stackOnlyBar: true
               yaxis:
                 - title:
-                    text: ""
+                    text: ''
                   decimalsInFloat: 2
                   forceNiceScale: true
                   labels:
@@ -1138,7 +1148,7 @@ views:
                 name: Today
                 type: column
                 float_precision: 3
-                color: "#e0e0e3"
+                color: '#e0e0e3'
                 show:
                   in_header: false
                   legend_value: false
@@ -1223,13 +1233,13 @@ views:
               - entity: input_text.dynamic_manual_period
                 name: Manual Periods
           - type: heading
-            icon: ""
+            icon: ''
             heading: Dynamic Tomorrow
             heading_style: title
             visibility:
               - condition: time
-                after: "13:30:00"
-                before: "24:00:00"
+                after: '13:30:00'
+                before: '24:00:00'
             badges: []
           - type: custom:apexcharts-card
             update_interval: 1sec
@@ -1254,7 +1264,7 @@ views:
                 x:
                   format: HH:mm
                   show: false
-                "y":
+                'y':
                   formatter: |
                     EVAL: (val) => `${val.toFixed(3)} €/kWh`
               grid:
@@ -1269,7 +1279,7 @@ views:
                 stackOnlyBar: true
               yaxis:
                 - title:
-                    text: ""
+                    text: ''
                   decimalsInFloat: 2
                   forceNiceScale: true
                   labels:
@@ -1296,7 +1306,7 @@ views:
                 name: Tomorrow
                 type: column
                 float_precision: 3
-                color: "#e0e0e3"
+                color: '#e0e0e3'
                 show:
                   in_header: false
                   legend_value: false
@@ -1355,8 +1365,8 @@ views:
                   });
             visibility:
               - condition: time
-                after: "13:30:00"
-                before: "24:00:00"
+                after: '13:30:00'
+                before: '24:00:00'
           - type: horizontal-stack
             cards:
               - type: tile
@@ -1383,8 +1393,8 @@ views:
                 features_position: bottom
             visibility:
               - condition: time
-                after: "13:30:00"
-                before: "24:00:00"
+                after: '13:30:00'
+                before: '24:00:00'
           - type: entities
             entities:
               - entity: input_number.dynamic_lowest_price_x_period_tomorrow
@@ -1396,18 +1406,18 @@ views:
               - type: conditional
                 conditions:
                   - entity: sensor.dynamic_next_day_manual_period
-                    state_not: ""
+                    state_not: ''
                 row:
                   entity: sensor.dynamic_next_day_manual_period
                   name: Manual Periods For Tomorrow (calculated)
             visibility:
               - condition: time
-                after: "13:30:00"
-                before: "24:00:00"
+                after: '13:30:00'
+                before: '24:00:00'
         visibility:
           - condition: state
             entity: input_boolean.dashboard_setting_show_dynamic
-            state: "on"
+            state: 'on'
     cards: []
     icon: mdi:battery
     dense_section_placement: false
@@ -1420,7 +1430,7 @@ views:
       - type: grid
         cards:
           - type: heading
-            icon: ""
+            icon: ''
             heading_style: title
             heading: Global
           - type: entities
@@ -1453,7 +1463,7 @@ views:
               - entity: sensor.zendure_maximum_state_of_charge
                 name: Max. State Of Charge
           - type: heading
-            icon: ""
+            icon: ''
             heading: Relay Switches
             heading_style: title
             badges:
@@ -1461,7 +1471,7 @@ views:
                 show_state: true
                 show_icon: true
                 entity: sensor.zendure_relay_switches_today
-                color: "#01a180"
+                color: '#01a180'
                 name: Today
                 state_content:
                   - name
@@ -1483,21 +1493,21 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: custom:apexcharts-card
             stacked: true
             header:
               show: true
-              title: ""
+              title: ''
             graph_span: 2month
             span:
               start: month
-              offset: "-1month"
+              offset: -1month
             cache: false
             apex_config:
               annotations:
                 yaxis:
-                  - "y": 100
+                  - 'y': 100
                     borderColor: var(--accent-color)
                     strokeDashArray: 4
                     borderWidth: 2
@@ -1524,6 +1534,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1533,13 +1545,13 @@ views:
             series:
               - entity: sensor.zendure_relay_switches_charging_today
                 name: Relay Switches (Charging)
-                transform: "return x > 0 ? x - 1 : 0;"
+                transform: 'return x > 0 ? x - 1 : 0;'
                 statistics:
                   period: day
                   type: max
                   align: middle
                 type: column
-                color: "#01a180"
+                color: '#01a180'
                 show:
                   in_header: false
                   extremas: false
@@ -1550,12 +1562,12 @@ views:
                   type: max
                   align: middle
                 type: column
-                color: "#01a180"
+                color: '#01a180'
                 show:
                   in_header: false
                   extremas: false
           - type: heading
-            icon: ""
+            icon: ''
             heading: Calibrations
             heading_style: title
             badges:
@@ -1563,14 +1575,14 @@ views:
                 show_state: true
                 show_icon: true
                 entity: sensor.zendure_last_calibration
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
               - type: entity
                 show_state: true
                 show_icon: true
                 entity: sensor.zendure_last_calibration_days
-                color: "#01a180"
+                color: '#01a180'
           - type: markdown
             content: >-
               <ha-alert alert-type="info">Help text</ha-alert>The number of
@@ -1586,7 +1598,7 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: custom:apexcharts-card
             experimental:
               hidden_by_default: true
@@ -1594,11 +1606,11 @@ views:
             stacked: true
             header:
               show: true
-              title: ""
+              title: ''
             graph_span: 2month
             span:
               start: month
-              offset: "-1month"
+              offset: -1month
             cache: false
             apex_config:
               yaxis:
@@ -1616,7 +1628,7 @@ views:
                 x:
                   format: d/MM
                   show: false
-                "y":
+                'y':
                   formatter: |
                     function(value, { seriesIndex, w }) {
                       const name = w.globals.seriesNames[seriesIndex];
@@ -1636,6 +1648,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1652,7 +1666,7 @@ views:
                   type: max
                   align: middle
                 type: column
-                color: "#01a180"
+                color: '#01a180'
                 show:
                   in_header: false
                   extremas: false
@@ -1665,14 +1679,14 @@ views:
                   type: max
                   align: middle
                 type: column
-                color: "#a2a2a3"
+                color: '#a2a2a3'
                 show:
                   in_header: false
                   extremas: false
       - type: grid
         cards:
           - type: heading
-            icon: ""
+            icon: ''
             heading: Inverter Temperature
             heading_style: title
             badges:
@@ -1680,7 +1694,7 @@ views:
                 show_state: true
                 show_icon: true
                 entity: sensor.zendure_inverter_temperature
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
           - type: markdown
@@ -1693,14 +1707,14 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: custom:apexcharts-card
             experimental:
               hidden_by_default: true
               color_threshold: true
             header:
               show: true
-              title: ""
+              title: ''
             graph_span: 1day
             span:
               start: day
@@ -1713,7 +1727,7 @@ views:
                   size: 0
               annotations:
                 yaxis:
-                  - "y": 55
+                  - 'y': 55
                     borderColor: var(--accent-color)
                     strokeDashArray: 4
                     borderWidth: 2
@@ -1743,6 +1757,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1761,7 +1777,7 @@ views:
                   type: max
                   align: start
                 type: area
-                color: "#01a180"
+                color: '#01a180'
                 show:
                   in_header: false
                 color_threshold:
@@ -1794,7 +1810,7 @@ views:
                   in_header: false
                   in_legend: false
           - type: heading
-            icon: ""
+            icon: ''
             heading: Batteries
             heading_style: title
           - type: horizontal-stack
@@ -1811,7 +1827,7 @@ views:
                 visibility:
                   - condition: state
                     entity: sensor.zendure_total_batteries
-                    state: "1"
+                    state: '1'
               - type: entities
                 show_header_toggle: false
                 entities:
@@ -1830,7 +1846,7 @@ views:
                 visibility:
                   - condition: state
                     entity: sensor.zendure_total_batteries
-                    state: "2"
+                    state: '2'
               - type: entities
                 show_header_toggle: false
                 entities:
@@ -1855,7 +1871,7 @@ views:
                 visibility:
                   - condition: state
                     entity: sensor.zendure_total_batteries
-                    state: "3"
+                    state: '3'
               - type: entities
                 show_header_toggle: false
                 entities:
@@ -1886,7 +1902,7 @@ views:
                 visibility:
                   - condition: state
                     entity: sensor.zendure_total_batteries
-                    state: "4"
+                    state: '4'
               - type: entities
                 show_header_toggle: false
                 entities:
@@ -1923,7 +1939,7 @@ views:
                 visibility:
                   - condition: state
                     entity: sensor.zendure_total_batteries
-                    state: "5"
+                    state: '5'
               - type: entities
                 show_header_toggle: false
                 entities:
@@ -1970,8 +1986,8 @@ views:
       - type: grid
         cards:
           - type: heading
-            icon: ""
-            heading: " Import Efficiency (Indication)"
+            icon: ''
+            heading: ' Import Efficiency (Indication)'
             heading_style: title
             badges: []
           - type: markdown
@@ -1985,7 +2001,7 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: custom:apexcharts-card
             experimental:
               hidden_by_default: true
@@ -1993,7 +2009,7 @@ views:
             update_interval: 5min
             header:
               show: true
-              title: ""
+              title: ''
             graph_span: 1day
             span:
               start: day
@@ -2030,6 +2046,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -2047,7 +2065,7 @@ views:
                   type: mean
                   align: start
                 type: area
-                color: "#01a180"
+                color: '#01a180'
                 show:
                   in_header: false
                 color_threshold:
@@ -2072,7 +2090,7 @@ views:
                 opacity: 0
                 extend_to: now
                 transform: return Math.max(0, x);
-                color: "#e4e4e7"
+                color: '#e4e4e7'
                 show:
                   in_header: false
           - type: entities
@@ -2084,7 +2102,7 @@ views:
               - entity: sensor.zendure_import_efficiency_24h
                 name: Import Efficiency (24h average)
           - type: heading
-            icon: ""
+            icon: ''
             heading: Export Efficiency (Indication)
             heading_style: title
           - type: markdown
@@ -2098,7 +2116,7 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: custom:apexcharts-card
             experimental:
               hidden_by_default: true
@@ -2106,7 +2124,7 @@ views:
             update_interval: 5min
             header:
               show: true
-              title: ""
+              title: ''
             graph_span: 1day
             span:
               start: day
@@ -2143,6 +2161,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -2160,7 +2180,7 @@ views:
                   type: mean
                   align: start
                 type: area
-                color: "#01a180"
+                color: '#01a180'
                 show:
                   in_header: false
                 color_threshold:
@@ -2185,7 +2205,7 @@ views:
                 opacity: 0
                 extend_to: now
                 transform: return Math.max(0, -x);
-                color: "#e4e4e7"
+                color: '#e4e4e7'
                 show:
                   in_header: false
           - type: entities
@@ -2206,7 +2226,7 @@ views:
       - type: grid
         cards:
           - type: heading
-            icon: ""
+            icon: ''
             heading_style: title
             badges:
               - type: entity
@@ -2215,12 +2235,12 @@ views:
                 entity: sensor.zendure_power
                 tap_action:
                   action: more-info
-                color: "#01a180"
+                color: '#01a180'
               - type: entity
                 show_state: true
                 show_icon: true
                 entity: sensor.zendure_total_state_of_charge
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
               - type: entity
@@ -2228,7 +2248,7 @@ views:
                 show_icon: true
                 entity: sensor.zendure_relay_switches_today
                 icon: mdi:swap-vertical-bold
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
             heading: Battery (7 days)
@@ -2267,10 +2287,10 @@ views:
                 header:
                   show: true
                   show_states: true
-                  title: ""
+                  title: ''
                 graph_span: 8d
                 span:
-                  offset: "-7d"
+                  offset: -7d
                   start: day
                 series:
                   - entity: sensor.zendure_power
@@ -2284,7 +2304,7 @@ views:
                     stroke_width: 2
                     opacity: 0.35
                     extend_to: now
-                    color: "#01a180"
+                    color: '#01a180'
                     float_precision: 0
                     color_threshold:
                       - value: -2000
@@ -2332,7 +2352,7 @@ views:
                     stroke_width: 0
                     opacity: 0.3
                     extend_to: now
-                    color: "#c0c0c2"
+                    color: '#c0c0c2'
                     float_precision: 0
                     yaxis_id: energy
                     show:
@@ -2362,6 +2382,8 @@ views:
                       format: dd-MM (HH:mm)
                       show: false
                   xaxis:
+                    tooltip:
+                      enabled: true
                     labels:
                       show: false
                       style:
@@ -2374,7 +2396,7 @@ views:
                         transparent)
                   yaxis:
                     - title:
-                        text: ""
+                        text: ''
                       decimalsInFloat: 0
                       labels:
                         style:
@@ -2409,7 +2431,7 @@ views:
               columns: 36
               rows: auto
           - type: heading
-            icon: ""
+            icon: ''
             heading: Inverter Temperature (7 days)
             heading_style: title
             badges:
@@ -2417,7 +2439,7 @@ views:
                 show_state: true
                 show_icon: true
                 entity: sensor.zendure_inverter_temperature
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
           - type: vertical-stack
@@ -2454,10 +2476,10 @@ views:
                       height: 100
                 header:
                   show: true
-                  title: ""
+                  title: ''
                 graph_span: 8day
                 span:
-                  offset: "-7d"
+                  offset: -7d
                   start: day
                 stacked: true
                 cache: false
@@ -2468,7 +2490,7 @@ views:
                       size: 0
                   annotations:
                     yaxis:
-                      - "y": 55
+                      - 'y': 55
                         borderColor: var(--accent-color)
                         strokeDashArray: 4
                         borderWidth: 2
@@ -2498,6 +2520,8 @@ views:
                   legend:
                     show: false
                   xaxis:
+                    tooltip:
+                      enabled: true
                     labels:
                       show: false
                     axisTicks:
@@ -2518,7 +2542,7 @@ views:
                       type: max
                       align: start
                     type: area
-                    color: "#01a180"
+                    color: '#01a180'
                     show:
                       in_header: false
                       in_brush: true
@@ -2565,7 +2589,7 @@ views:
       - type: grid
         cards:
           - type: heading
-            icon: ""
+            icon: ''
             heading: Connected Zendure
             heading_style: title
           - type: markdown
@@ -2664,7 +2688,7 @@ views:
               columns: 9
               rows: auto
           - type: heading
-            icon: ""
+            icon: ''
             heading: Configuration (Basic)
             heading_style: title
             badges:
@@ -2677,7 +2701,7 @@ views:
                     entity_id: input_button.zendure_setting_set_default_settings
                   data: {}
                 text: Default settings
-                color: "#01a180"
+                color: '#01a180'
           - type: markdown
             content: >-
               <ha-alert alert-type="info">Help text</ha-alert>Enter the IP
@@ -2698,7 +2722,7 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: entities
             entities:
               - entity: input_text.zendure_setting_ip_address
@@ -2706,7 +2730,7 @@ views:
               - entity: input_number.zendure_setting_standby_delay
                 name: Standby Delay
           - type: heading
-            icon: ""
+            icon: ''
             heading: Configuration (Charging)
             heading_style: title
             badges:
@@ -2715,7 +2739,7 @@ views:
                 show_icon: true
                 entity: sensor.zendure_inverter_max_charge_power
                 icon: mdi:api
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
           - type: markdown
@@ -2728,7 +2752,7 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: entities
             entities:
               - entity: input_number.zendure_setting_max_charge_power
@@ -2738,7 +2762,7 @@ views:
               - entity: input_number.zendure_setting_charge_buffer
                 name: Charge Buffer
           - type: heading
-            icon: ""
+            icon: ''
             heading: Configuration (Discharging)
             heading_style: title
             badges:
@@ -2746,7 +2770,7 @@ views:
                 show_state: true
                 show_icon: true
                 entity: sensor.zendure_inverter_max_discharge_power
-                color: "#01a180"
+                color: '#01a180'
                 icon: mdi:api
                 tap_action:
                   action: more-info
@@ -2760,7 +2784,7 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: entities
             entities:
               - entity: input_number.zendure_setting_max_discharge_power
@@ -2772,7 +2796,7 @@ views:
       - type: grid
         cards:
           - type: heading
-            icon: ""
+            icon: ''
             heading: Configuration (State Of Charge)
             heading_style: title
             badges:
@@ -2781,7 +2805,7 @@ views:
                 show_icon: true
                 entity: sensor.zendure_minimum_state_of_charge
                 icon: mdi:api
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
               - type: entity
@@ -2789,7 +2813,7 @@ views:
                 show_icon: false
                 entity: sensor.zendure_maximum_state_of_charge
                 icon: mdi:api
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
           - type: markdown
@@ -2816,7 +2840,7 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: entities
             entities:
               - entity: input_boolean.zendure_setting_soc_protection_disabled
@@ -2826,7 +2850,7 @@ views:
               - entity: input_number.zendure_setting_maximum_allowed_state_of_charge
                 name: Max. State Of Charge
           - type: heading
-            icon: ""
+            icon: ''
             heading: Configuration (PV)
             heading_style: title
             badges:
@@ -2835,13 +2859,13 @@ views:
                 show_icon: true
                 entity: sensor.zendure_pv_export_mode
                 icon: mdi:api
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: more-info
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_pv
-                state: "on"
+                state: 'on'
           - type: entities
             entities:
               - entity: input_boolean.zendure_setting_pv_export_disabled
@@ -2849,9 +2873,9 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_pv
-                state: "on"
+                state: 'on'
           - type: heading
-            icon: ""
+            icon: ''
             heading: Configuration (Optional)
             heading_style: title
           - type: markdown
@@ -2874,29 +2898,29 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: entities
             entities:
               - entity: input_text.home_energy_setting_meter_sensor
               - entity: input_text.zendure_setting_battery_order
                 name: Battery Order
           - type: heading
-            icon: ""
+            icon: ''
             heading: Configuration (Dynamic)
             heading_style: title
             badges: []
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_dynamic
-                state: "on"
+                state: 'on'
           - type: markdown
             content: >-
               <ha-alert alert-type="info">Help text</ha-alert>If you have a
               dynamic contract, you can enter this under **Dynamic Nordpool
-              Sensor⚙️**. For example **sensor.nordpool_kwh_nl_eur_3_09_0**
-              from the Nordpool HACS integration, or a Frank Energie price
-              sensor such as **sensor.current_electricity_price** (the sensor
-              with the **prices** attribute).
+              Sensor⚙️**. For example **sensor.nordpool_kwh_nl_eur_3_09_0** from
+              the Nordpool HACS integration, or a Frank Energie price sensor
+              such as **sensor.current_electricity_price** (the sensor with the
+              **prices** attribute).
 
 
               Specify the minimum spread required to make use of charging and
@@ -2906,10 +2930,10 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
               - condition: state
                 entity: input_boolean.dashboard_setting_show_dynamic
-                state: "on"
+                state: 'on'
             text_only: true
           - type: entities
             entities:
@@ -2923,9 +2947,9 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_dynamic
-                state: "on"
+                state: 'on'
           - type: heading
-            icon: ""
+            icon: ''
             heading_style: title
             heading: Configuration (Dashboard)
           - type: markdown
@@ -2937,7 +2961,7 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: entities
             entities:
               - entity: input_boolean.dashboard_setting_show_help
@@ -2954,7 +2978,7 @@ views:
                 tap_action:
                   action: navigate
                   navigation_path: /logbook
-                color: "#01a180"
+                color: '#01a180'
                 text: More
           - type: logbook
             target:
@@ -2965,14 +2989,14 @@ views:
               rows: 12
             hours_to_show: 4
           - type: heading
-            icon: ""
+            icon: ''
             heading: Version
             heading_style: title
             badges:
               - type: button
                 icon: mdi:information
                 text: Show Last Releasenotes
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: navigate
                   navigation_path: releasenotes
@@ -2981,14 +3005,14 @@ views:
                 entity: sensor.github_zendure_gielz1986_releasecheck
                 state_not: Pre-release Active
           - type: heading
-            icon: ""
+            icon: ''
             heading: Version
             heading_style: title
             badges:
               - type: button
                 icon: mdi:information
                 text: Show pre-releasenotes
-                color: "#01a180"
+                color: '#01a180'
                 tap_action:
                   action: url
                   url_path: https://github.com/Gielz1986/Zendure-HA-zenSDK/pulls
@@ -3006,7 +3030,7 @@ views:
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
-                state: "on"
+                state: 'on'
           - type: entities
             entities:
               - entity: sensor.zendure_configuration_version
