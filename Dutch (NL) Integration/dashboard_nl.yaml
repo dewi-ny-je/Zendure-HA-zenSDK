@@ -74,6 +74,18 @@ views:
               - condition: state
                 entity: input_select.zendure_2400_ac_modus_selecteren
                 state: Handmatig
+          - type: entities
+            entities:
+              - entity: input_number.dynamisch_oplaadvermogen
+                name: Oplaadvermogen
+                secondary_info: last-changed
+            visibility:
+              - condition: state
+                entity: input_select.zendure_2400_ac_modus_selecteren
+                state: Dynamisch Handelen
+              - condition: state
+                entity: input_boolean.dynamisch_oplaadvermogen_optimalisatie
+                state: "on"
           - type: custom:apexcharts-card
             experimental:
               hidden_by_default: true
@@ -1224,6 +1236,8 @@ views:
                 name: Duurste Periodes
               - entity: input_text.dynamisch_handmatige_periode
                 name: Handmatige Periodes
+              - entity: input_number.dynamisch_oplaadvermogen
+                name: Dynamisch Oplaadvermogen
           - type: heading
             icon: ""
             heading: Dynamisch Morgen
@@ -2893,6 +2907,17 @@ views:
 
               Heb je een 15 minuten contract vink dit dan aan zodat de grafieken
               en de prijzen goed gezet worden.
+
+
+              Staat **Oplaadvermogen Optimalisatie⚙️** aan, dan wordt elke nacht
+              het aantal goedkoopste periodes uitgebreid van 11 tot 23, zolang
+              de spread binnen die periodes binnen 2% van de laagste prijs van
+              de dag blijft. Het gevonden aantal komt in **Goedkoopste
+              Periodes** te staan en het bijbehorende vermogen in **Dynamisch
+              Oplaadvermogen**, waarmee Dynamisch Handelen laadt in plaats van
+              met het maximale oplaadvermogen. Ontladen blijft op het maximale
+              ontlaadvermogen. Handmatige periodes gaan voor: zijn die
+              ingevuld, dan wordt de optimalisatie overgeslagen.
             text_only: true
             visibility:
               - condition: state
@@ -2910,6 +2935,8 @@ views:
                 name: Minimale Spread
               - entity: input_boolean.dynamisch_15_minuten
                 name: 15 Minuten Tarieven Actief
+              - entity: input_boolean.dynamisch_oplaadvermogen_optimalisatie
+                name: Oplaadvermogen Optimalisatie
             visibility:
               - condition: state
                 entity: input_boolean.dynamisch_tonen_op_dashboard

@@ -25,6 +25,10 @@ input_boolean:
     name: Dynamisch 15 Minuten
     icon: mdi:clock-time-three-outline
 
+  dynamisch_oplaadvermogen_optimalisatie:
+    name: Dynamisch Oplaadvermogen Optimalisatie
+    icon: mdi:auto-fix
+
   dynamisch_recent_geladen:
     name: Dynamisch Recent Geladen
     icon: mdi:battery-check
@@ -222,6 +226,15 @@ input_number:
     max: 96
     step: 1
     mode: box
+
+  dynamisch_oplaadvermogen:
+    name: Dynamisch Oplaadvermogen
+    icon: mdi:battery-charging-medium
+    min: 0
+    max: 12000
+    step: 1
+    mode: box
+    unit_of_measurement: "W"
 
   zendure_2400_ac_minimaal_toegestaan_laadpercentage:
     name: Zendure 2400 AC Minimaal Toegestaan Laadpercentage
