@@ -1528,10 +1528,19 @@ actions:
                 condition: state
                 entity_id: input_boolean.dynamisch_oplaadvermogen_optimalisatie
                 state: "on"
-              - alias: Geen handmatige periodes ingesteld voor vandaag
+              - alias: Vandaag is niet vastgezet met absolute handmatige periodes (stijl G14:00)
                 condition: template
                 value_template: >-
-                  {{ states('input_text.dynamisch_handmatige_periode') | length == 0 }}
+                  {% set txt = states('input_text.dynamisch_handmatige_periode') %}
+                  {% set txt = '' if txt in ['unknown', 'unavailable'] else txt %}
+                  {% set ns = namespace(vast=false) %}
+                  {% for deel in txt.split(';') %}
+                  {% set t = deel | trim | replace(' ', '') | upper %}
+                  {% if t | regex_match('^[GD][0-9]{1,2}:[0-9]{2}(-[0-9]{1,2}:[0-9]{2})?$') %}
+                  {% set ns.vast = true %}
+                  {% endif %}
+                  {% endfor %}
+                  {{ not ns.vast }}
             then:
               - alias: Wachten tot de dynamische prijzen van vandaag beschikbaar zijn
                 wait_template: >-
@@ -1602,7 +1611,8 @@ actions:
                       name: " "
             else:
               - alias: >-
-                  Optimalisatie uit of handmatige periodes in gebruik, wis het oplaadvermogen
+                  Optimalisatie uit of de dag vastgezet met absolute handmatige periodes, wis
+                  het oplaadvermogen
                   zodat Dynamisch Handelen terugvalt op het maximale oplaadvermogen
                 action: input_number.set_value
                 target:

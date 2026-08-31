@@ -2950,8 +2950,10 @@ views:
               **Lowest Price Periods** and the matching charge power to
               **Dynamic Charge Power**, which Dynamic Trading then charges at
               instead of the maximum charge power. Discharging keeps using the
-              maximum discharge power. Manual periods take precedence: when
-              those are filled in, the optimisation is skipped.
+              maximum discharge power. Pinning the day with absolute manual
+              periods (**G14:00** style) takes precedence and skips the
+              optimisation; carried-over periods and **+**/**-** overrides do
+              not, since those still leave the period count in charge.
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help

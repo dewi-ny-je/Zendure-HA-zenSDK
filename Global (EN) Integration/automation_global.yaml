@@ -1504,10 +1504,19 @@ actions:
                 condition: state
                 entity_id: input_boolean.dynamic_setting_charge_power_optimisation
                 state: "on"
-              - alias: No manual periods defined for today
+              - alias: Today is not pinned with absolute manual periods (G14:00 style)
                 condition: template
                 value_template: >-
-                  {{ states('input_text.dynamic_manual_period') | length == 0 }}
+                  {% set txt = states('input_text.dynamic_manual_period') %}
+                  {% set txt = '' if txt in ['unknown', 'unavailable'] else txt %}
+                  {% set ns = namespace(vast=false) %}
+                  {% for deel in txt.split(';') %}
+                  {% set t = deel | trim | replace(' ', '') | upper %}
+                  {% if t | regex_match('^[GD][0-9]{1,2}:[0-9]{2}(-[0-9]{1,2}:[0-9]{2})?$') %}
+                  {% set ns.vast = true %}
+                  {% endif %}
+                  {% endfor %}
+                  {{ not ns.vast }}
             then:
               - alias: Wait until today's dynamic prices are available
                 wait_template: >-
@@ -1577,7 +1586,8 @@ actions:
                       name: " "
             else:
               - alias: >-
-                  Optimisation disabled or manual periods in use, clear the charge power so
+                  Optimisation disabled or the day pinned with absolute manual periods, clear
+                  the charge power so
                   Dynamic Trading falls back to the maximum charge power
                 action: input_number.set_value
                 target:

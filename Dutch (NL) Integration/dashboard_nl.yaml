@@ -2958,8 +2958,11 @@ views:
               Periodes** te staan en het bijbehorende vermogen in **Dynamisch
               Oplaadvermogen**, waarmee Dynamisch Handelen laadt in plaats van
               met het maximale oplaadvermogen. Ontladen blijft op het maximale
-              ontlaadvermogen. Handmatige periodes gaan voor: zijn die
-              ingevuld, dan wordt de optimalisatie overgeslagen.
+              ontlaadvermogen. Zet je de dag vast met absolute handmatige
+              periodes (stijl **G14:00**), dan gaat dat voor en wordt de
+              optimalisatie overgeslagen; overgedragen periodes en
+              **+**/**-**-correcties niet, want daarbij blijft het aantal
+              periodes leidend.
             text_only: true
             visibility:
               - condition: state
