@@ -686,11 +686,17 @@ actions:
           - condition: trigger
             id:
               - aansturing_trigger
-          - condition: template
+          - alias: >-
+              Werkelijk oplaadvermogen wijkt af van het doel: het geoptimaliseerde dynamische
+              oplaadvermogen tijdens Dynamisch Handelen, anders het maximale oplaadvermogen
+            condition: template
             value_template: >-
-              {{ states('sensor.zendure_2400_ac_ingesteld_oplaadvermogen') |
-              float != states('input_number.zendure_2400_ac_max_oplaadvermogen')
-              | float }}
+              {% set optimised = is_state('input_select.zendure_2400_ac_modus_selecteren', 'Dynamisch Handelen')
+              and is_state('input_boolean.dynamisch_oplaadvermogen_optimalisatie', 'on')
+              and states('input_number.dynamisch_oplaadvermogen') | float(0) > 0 %}
+              {{ states('sensor.zendure_2400_ac_ingesteld_oplaadvermogen') | float !=
+              (states('input_number.dynamisch_oplaadvermogen') | float if optimised
+              else states('input_number.zendure_2400_ac_max_oplaadvermogen') | float) }}
           - condition: or
             conditions:
               - condition: state
@@ -714,14 +720,19 @@ actions:
             data:
               sn: "{{ states('sensor.zendure_2400_ac_serienummer') }}"
               inputLimit: >-
-                {{ states('input_number.zendure_2400_ac_max_oplaadvermogen') |
-                int }}
+                {% set optimised = is_state('input_select.zendure_2400_ac_modus_selecteren', 'Dynamisch Handelen')
+                and is_state('input_boolean.dynamisch_oplaadvermogen_optimalisatie', 'on')
+                and states('input_number.dynamisch_oplaadvermogen') | float(0) > 0 %}
+                {{ states('input_number.dynamisch_oplaadvermogen') | int if optimised
+                else states('input_number.zendure_2400_ac_max_oplaadvermogen') | int }}
           - action: logbook.log
             data:
-              message: >
-                ⚙️Huidig oplaadvermogen gecorrigeerd naar {{
-                states('input_number.zendure_2400_ac_max_oplaadvermogen') | int
-                }} watt —
+              message: >-
+                {% set optimised = is_state('input_select.zendure_2400_ac_modus_selecteren', 'Dynamisch Handelen')
+                and is_state('input_boolean.dynamisch_oplaadvermogen_optimalisatie', 'on')
+                and states('input_number.dynamisch_oplaadvermogen') | float(0) > 0 %}
+                ⚙️Huidig oplaadvermogen gecorrigeerd naar {{ states('input_number.dynamisch_oplaadvermogen') | int
+                if optimised else states('input_number.zendure_2400_ac_max_oplaadvermogen') | int }} watt —
               entity_id: input_select.zendure_2400_ac_modus_selecteren
               name: " "
         alias: Huidig oplaadvermogen corrigeren

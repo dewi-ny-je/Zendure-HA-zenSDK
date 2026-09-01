@@ -677,10 +677,17 @@ actions:
           - condition: trigger
             id:
               - aansturing_trigger
-          - condition: template
+          - alias: >-
+              Actual charge power differs from the target, which is the optimised dynamic charge
+              power during Dynamic Trading and otherwise the maximum charge power
+            condition: template
             value_template: >-
+              {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
+              and is_state('input_boolean.dynamic_setting_charge_power_optimisation', 'on')
+              and states('input_number.dynamic_charge_power') | float(0) > 0 %}
               {{ states('sensor.zendure_set_charge_power') | float !=
-              states('input_number.zendure_setting_max_charge_power') | float }}
+              (states('input_number.dynamic_charge_power') | float if optimised
+              else states('input_number.zendure_setting_max_charge_power') | float) }}
           - condition: or
             conditions:
               - condition: state
@@ -704,14 +711,19 @@ actions:
             data:
               sn: "{{ states('sensor.zendure_serial_number') }}"
               inputLimit: >-
-                {{ states('input_number.zendure_setting_max_charge_power') | int
-                }}
+                {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
+                and is_state('input_boolean.dynamic_setting_charge_power_optimisation', 'on')
+                and states('input_number.dynamic_charge_power') | float(0) > 0 %}
+                {{ states('input_number.dynamic_charge_power') | int if optimised
+                else states('input_number.zendure_setting_max_charge_power') | int }}
           - action: logbook.log
             data:
-              message: >
-                ⚙️Current charging power corrected to {{
-                states('input_number.zendure_setting_max_charge_power') | int }}
-                watt —
+              message: >-
+                {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
+                and is_state('input_boolean.dynamic_setting_charge_power_optimisation', 'on')
+                and states('input_number.dynamic_charge_power') | float(0) > 0 %}
+                ⚙️Current charging power corrected to {{ states('input_number.dynamic_charge_power') | int
+                if optimised else states('input_number.zendure_setting_max_charge_power') | int }} watt —
               entity_id: input_select.zendure_operation_mode
               name: " "
         alias: Correct current charging power
