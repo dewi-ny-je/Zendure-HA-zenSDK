@@ -1246,8 +1246,6 @@ views:
                 name: Duurste Periodes
               - entity: input_text.dynamisch_handmatige_periode
                 name: Handmatige Periodes
-              - entity: input_number.dynamisch_oplaadvermogen
-                name: Dynamisch Oplaadvermogen
           - type: heading
             icon: ""
             heading: Dynamisch Morgen

@@ -1244,8 +1244,6 @@ views:
                 name: Highest Price Periods
               - entity: input_text.dynamic_manual_period
                 name: Manual Periods
-              - entity: input_number.dynamic_charge_power
-                name: Dynamic Charge Power
           - type: heading
             icon: ''
             heading: Dynamic Tomorrow
