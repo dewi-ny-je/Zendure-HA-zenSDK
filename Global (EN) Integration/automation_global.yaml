@@ -1403,6 +1403,93 @@ actions:
               entity_id: input_select.zendure_operation_mode
               name: " "
         alias: During charging balance to -xxx watt (100% of the demand)
+      - conditions:
+          - condition: trigger
+            id:
+              - aansturing_trigger
+          - condition: or
+            conditions:
+              - condition: state
+                entity_id: input_select.zendure_operation_mode
+                state: Smart Matching
+              - condition: state
+                entity_id: input_select.zendure_operation_mode
+                state: Smart Discharge Only
+              - condition: state
+                entity_id: input_select.zendure_operation_mode
+                state:
+                  - Dynamic Smart Matching
+              - condition: state
+                entity_id: input_select.zendure_operation_mode
+                state:
+                  - Dynamic Smart Matching (Expensive)
+              - condition: state
+                entity_id: input_select.zendure_operation_mode
+                state:
+                  - Dynamic Trading + Smart Matching
+          - alias: >-
+              Minimum configured SOC reached or discharge limit reported by the
+              device
+            condition: or
+            conditions:
+              - condition: template
+                value_template: |
+                  {{ states('sensor.zendure_total_state_of_charge') | float(0) <=
+                     states('sensor.zendure_minimum_state_of_charge') | float(0) }}
+              - condition: state
+                entity_id: sensor.zendure_soc_limit_status
+                state:
+                  - Discharge Limit Reached
+          - alias: The device still has a discharge power set
+            condition: template
+            value_template: |
+              {{ states('sensor.zendure_set_discharge_power') | int(0) > 0 }}
+          - alias: >-
+              Leave the minimum SOC to the SOC protection while that is
+              (re)charging the battery
+            condition: or
+            conditions:
+              - condition: state
+                entity_id: input_boolean.zendure_setting_soc_protection_disabled
+                state:
+                  - "on"
+              - condition: template
+                value_template: |
+                  {{ states('sensor.zendure_total_state_of_charge') | float(0) >=
+                     states('sensor.zendure_minimum_state_of_charge') | float(0) }}
+          - alias: Do not interrupt charging that is already running
+            condition: numeric_state
+            entity_id: sensor.zendure_power
+            below: 30
+          - condition: and
+            conditions:
+              - condition: state
+                entity_id: input_boolean.dynamic_charging_running
+                state:
+                  - "off"
+              - condition: state
+                entity_id: input_boolean.dynamic_discharging_running
+                state:
+                  - "off"
+          - alias: Required sensors are available
+            condition: template
+            value_template: >-
+              {{ states('sensor.zendure_total_state_of_charge') not in ['unknown',
+              'unavailable']
+                 and states('sensor.zendure_minimum_state_of_charge') not in ['unknown', 'unavailable']
+                 and states('sensor.zendure_set_discharge_power') not in ['unknown', 'unavailable'] }}
+        sequence:
+          - action: rest_command.zendure_stop_with_discharging
+            data:
+              sn: "{{ states('sensor.zendure_serial_number') }}"
+          - action: logbook.log
+            data:
+              message: >-
+                🛑Minimum state of charge reached — discharge power reset to 0
+                watt —
+              entity_id: input_select.zendure_operation_mode
+              name: " "
+        alias: Stop discharging when the minimum state of charge is reached
   - alias: Manual Control
     choose:
       - conditions:
