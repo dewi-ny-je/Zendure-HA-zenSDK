@@ -47,10 +47,9 @@ triggers:
     id: modus_dynamisch_spread
   - trigger: state
     entity_id:
-      - input_boolean.dynamic_setting_trading_charge_power_optimisation
-      - input_boolean.dynamic_setting_trading_discharge_power_optimisation
+      - input_boolean.dynamic_setting_charge_power_optimisation
       - input_text.dynamic_manual_period
-    id: dynamic_trading_power_optimisation
+    id: dynamic_charge_power_optimisation
   - trigger: state
     entity_id:
       - input_number.zendure_setting_max_charge_power
@@ -709,7 +708,7 @@ actions:
             condition: template
             value_template: >-
               {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
-              and is_state('input_boolean.dynamic_setting_trading_charge_power_optimisation', 'on')
+              and is_state('input_boolean.dynamic_setting_charge_power_optimisation', 'on')
               and states('input_number.dynamic_charge_power') | float(0) > 0 %}
               {% set target = 'input_number.dynamic_charge_power' if optimised
               else 'input_number.zendure_setting_max_charge_power' %}
@@ -740,7 +739,7 @@ actions:
               sn: "{{ states('sensor.zendure_serial_number') }}"
               inputLimit: >-
                 {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
-                and is_state('input_boolean.dynamic_setting_trading_charge_power_optimisation', 'on')
+                and is_state('input_boolean.dynamic_setting_charge_power_optimisation', 'on')
                 and states('input_number.dynamic_charge_power') | float(0) > 0 %}
                 {{ states('input_number.dynamic_charge_power') | int(0) if optimised
                 else states('input_number.zendure_setting_max_charge_power') | int(0) }}
@@ -748,7 +747,7 @@ actions:
             data:
               message: >-
                 {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
-                and is_state('input_boolean.dynamic_setting_trading_charge_power_optimisation', 'on')
+                and is_state('input_boolean.dynamic_setting_charge_power_optimisation', 'on')
                 and states('input_number.dynamic_charge_power') | float(0) > 0 %}
                 ⚙️Current charging power corrected to {{ states('input_number.dynamic_charge_power') | int(0)
                 if optimised else states('input_number.zendure_setting_max_charge_power') | int(0) }} watt —
@@ -759,19 +758,13 @@ actions:
           - condition: trigger
             id:
               - aansturing_trigger
-          - alias: >-
-              Actual discharge power differs from the target, which is the optimised dynamic
-              discharge power during Dynamic Trading and otherwise the maximum discharge power
-            condition: template
+          - condition: template
             value_template: >-
-              {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
-              and is_state('input_boolean.dynamic_setting_trading_discharge_power_optimisation', 'on')
-              and states('input_number.dynamic_discharge_power') | float(0) > 0 %}
-              {% set target = 'input_number.dynamic_discharge_power' if optimised
-              else 'input_number.zendure_setting_max_discharge_power' %}
-              {{ has_value('sensor.zendure_set_discharge_power') and has_value(target)
+              {{ has_value('sensor.zendure_set_discharge_power')
+              and has_value('input_number.zendure_setting_max_discharge_power')
               and states('sensor.zendure_set_discharge_power') | float(0) !=
-              states(target) | float(0) }}
+              states('input_number.zendure_setting_max_discharge_power') | float(0)
+              }}
           - condition: or
             conditions:
               - condition: state
@@ -795,19 +788,14 @@ actions:
             data:
               sn: "{{ states('sensor.zendure_serial_number') }}"
               outputLimit: >-
-                {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
-                and is_state('input_boolean.dynamic_setting_trading_discharge_power_optimisation', 'on')
-                and states('input_number.dynamic_discharge_power') | float(0) > 0 %}
-                {{ states('input_number.dynamic_discharge_power') | int(0) if optimised
-                else states('input_number.zendure_setting_max_discharge_power') | int(0) }}
+                {{ states('input_number.zendure_setting_max_discharge_power') |
+                int(0) }}
           - action: logbook.log
             data:
               message: >
-                {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
-                and is_state('input_boolean.dynamic_setting_trading_discharge_power_optimisation', 'on')
-                and states('input_number.dynamic_discharge_power') | float(0) > 0 %}
-                ⚙️Current discharge power corrected to {{ states('input_number.dynamic_discharge_power') | int(0)
-                if optimised else states('input_number.zendure_setting_max_discharge_power') | int(0) }} watt —
+                ⚙️Current discharge power corrected to {{
+                states('input_number.zendure_setting_max_discharge_power') | int(0)
+                }} watt —
               entity_id: input_select.zendure_operation_mode
               name: " "
         alias: " Correct current discharge power"
@@ -1600,7 +1588,7 @@ actions:
           - condition: trigger
             id:
               - dynamisch_middernacht
-              - dynamic_trading_power_optimisation
+              - dynamic_charge_power_optimisation
           - condition: template
             value_template: >-
               {{
@@ -1654,35 +1642,25 @@ actions:
                   message: ⚙️Dynamic period settings copied from tomorrow to today —
                   entity_id: input_select.zendure_operation_mode
                   name: " "
-          - alias: >-
-              Determine whether today is pinned with absolute manual periods (G14:00 style).
-              The +/- modifiers do not pin, they only nudge the optimised selection.
-            variables:
-              dag_vastgezet: >-
-                {% set txt = states('input_text.dynamic_manual_period') %}
-                {% set txt = '' if txt in ['unknown', 'unavailable'] else txt %}
-                {% set ns = namespace(vast=false) %}
-                {% for deel in txt.split(';') %}
-                {% set t = deel | trim | replace(' ', '') | upper %}
-                {% if t | regex_match('^[GD][0-9]{1,2}:[0-9]{2}(-[0-9]{1,2}:[0-9]{2})?$') %}
-                {% set ns.vast = true %}
-                {% endif %}
-                {% endfor %}
-                {{ ns.vast }}
-          - alias: Wait for today's dynamic prices when an optimisation is enabled
+          - alias: Optimise the number of cheapest periods and the dynamic charge power
             if:
-              - alias: Charge or discharge power optimisation is enabled
-                condition: or
-                conditions:
-                  - condition: state
-                    entity_id: input_boolean.dynamic_setting_trading_charge_power_optimisation
-                    state: "on"
-                  - condition: state
-                    entity_id: input_boolean.dynamic_setting_trading_discharge_power_optimisation
-                    state: "on"
+              - alias: Charge power optimisation is enabled
+                condition: state
+                entity_id: input_boolean.dynamic_setting_charge_power_optimisation
+                state: "on"
               - alias: Today is not pinned with absolute manual periods (G14:00 style)
                 condition: template
-                value_template: "{{ dag_vastgezet | string | lower != 'true' }}"
+                value_template: >-
+                  {% set txt = states('input_text.dynamic_manual_period') %}
+                  {% set txt = '' if txt in ['unknown', 'unavailable'] else txt %}
+                  {% set ns = namespace(vast=false) %}
+                  {% for deel in txt.split(';') %}
+                  {% set t = deel | trim | replace(' ', '') | upper %}
+                  {% if t | regex_match('^[GD][0-9]{1,2}:[0-9]{2}(-[0-9]{1,2}:[0-9]{2})?$') %}
+                  {% set ns.vast = true %}
+                  {% endif %}
+                  {% endfor %}
+                  {{ not ns.vast }}
             then:
               - alias: Wait until today's dynamic prices are available
                 wait_template: >-
@@ -1690,120 +1668,74 @@ actions:
                   {{ p | count >= 11 and (p[0]['start'] | as_datetime | as_local).date() == now().date() }}
                 timeout: "00:10:00"
                 continue_on_timeout: true
-          - alias: Determine whether today's dynamic prices are available
-            variables:
-              prijzen_beschikbaar: >-
-                {% set p = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
-                {{ p | count >= 11 and (p[0]['start'] | as_datetime | as_local).date() == now().date() }}
-          - alias: Optimise the number of cheapest periods and the dynamic charge power
-            if:
-              - alias: Charge power optimisation is enabled
-                condition: state
-                entity_id: input_boolean.dynamic_setting_trading_charge_power_optimisation
-                state: "on"
-              - alias: Today is not pinned with absolute manual periods (G14:00 style)
-                condition: template
-                value_template: "{{ dag_vastgezet | string | lower != 'true' }}"
-              - alias: Today's prices are available
-                condition: template
-                value_template: "{{ prijzen_beschikbaar | string | lower == 'true' }}"
-            then:
+              - alias: Apply the optimisation once today's prices are available
+                if:
+                  - alias: Today's prices are available
+                    condition: template
+                    value_template: >-
+                      {% set p = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
+                      {{ p | count >= 11 and (p[0]['start'] | as_datetime | as_local).date() == now().date() }}
+                else:
+                  - alias: >-
+                      No prices for today, clear the charge power so Dynamic Trading falls back
+                      to the maximum charge power
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamic_charge_power
+                    data:
+                      value: 0
+                then:
+                  - alias: >-
+                      Widen the cheapest periods from 11 up to 23 and keep the last count whose
+                      average price stays within 2% of the average over the 11 cheapest periods
+                    variables:
+                      optimal_periods: >-
+                        {% set prijzen = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
+                        {% set waarden = prijzen | map(attribute='value') | map('float') | sort | list %}
+                        {% set basis = (waarden[:11] | sum) / 11 %}
+                        {% set drempel = 0.02 * (basis | abs) %}
+                        {% set maxn = [23, waarden | count] | min %}
+                        {% set ns = namespace(gekozen=maxn, gevonden=false) %}
+                        {% for x in range(12, maxn + 1) %}
+                        {% if not ns.gevonden and ((waarden[:x] | sum) / x - basis) > drempel %}
+                        {% set ns.gekozen = x - 1 %}
+                        {% set ns.gevonden = true %}
+                        {% endif %}
+                        {% endfor %}
+                        {{ ns.gekozen }}
+                  - alias: Charge power from y = 6.3131x² - 341.16x + 6002.5, capped at the maximum charge power
+                    variables:
+                      optimal_power: >-
+                        {% set x = optimal_periods | int %}
+                        {{ [ (6.3131 * x * x - 341.16 * x + 6002.5) | round(0) | int,
+                        states('input_number.zendure_setting_max_charge_power') | int(12000) ] | min }}
+                  - alias: Set the optimised number of cheapest periods for today
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamic_lowest_price_x_period
+                    data:
+                      value: "{{ optimal_periods | int }}"
+                  - alias: Set the dynamic charge power for today
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamic_charge_power
+                    data:
+                      value: "{{ optimal_power | int }}"
+                  - action: logbook.log
+                    data:
+                      message: >-
+                        ⚙️Dynamic charge power optimised to {{ optimal_power | int }} watt over the
+                        {{ optimal_periods | int }} cheapest periods —
+                      entity_id: input_select.zendure_operation_mode
+                      name: " "
+            else:
               - alias: >-
-                  The optimised number of cheapest periods, widened from 11 up to 23 within the
-                  Z/ZG search window when one is set and otherwise within the whole day
-                variables:
-                  optimal_periods: >-
-                    {% set opt = state_attr('sensor.dynamic_trading_power_optimisation', 'optimisation') or {} %}
-                    {{ opt.get('g', 0) | int(0) }}
-              - alias: Charge power from y = 6.3131x² - 341.16x + 6002.5, capped at the maximum charge power
-                variables:
-                  optimal_power: >-
-                    {% set x = optimal_periods | int %}
-                    {{ [ (6.3131 * x * x - 341.16 * x + 6002.5) | round(0) | int,
-                    states('input_number.zendure_setting_max_charge_power') | int(12000) ] | min }}
-              - alias: Set the optimised number of cheapest periods for today
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamic_lowest_price_x_period
-                data:
-                  value: "{{ optimal_periods | int }}"
-              - alias: Set the dynamic charge power for today
+                  Optimisation disabled or the day pinned with absolute manual periods, clear
+                  the charge power so
+                  Dynamic Trading falls back to the maximum charge power
                 action: input_number.set_value
                 target:
                   entity_id: input_number.dynamic_charge_power
-                data:
-                  value: "{{ optimal_power | int }}"
-              - action: logbook.log
-                data:
-                  message: >-
-                    ⚙️Dynamic charge power optimised to {{ optimal_power | int }} watt over the
-                    {{ optimal_periods | int }} cheapest periods —
-                  entity_id: input_select.zendure_operation_mode
-                  name: " "
-            else:
-              - alias: >-
-                  Optimisation disabled, the day pinned with absolute manual periods or no prices
-                  for today, clear the charge power so Dynamic Trading falls back to the maximum
-                  charge power
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamic_charge_power
-                data:
-                  value: 0
-          - alias: Optimise the number of most expensive periods and the dynamic discharge power
-            if:
-              - alias: Discharge power optimisation is enabled
-                condition: state
-                entity_id: input_boolean.dynamic_setting_trading_discharge_power_optimisation
-                state: "on"
-              - alias: Today is not pinned with absolute manual periods (G14:00 style)
-                condition: template
-                value_template: "{{ dag_vastgezet | string | lower != 'true' }}"
-              - alias: Today's prices are available
-                condition: template
-                value_template: "{{ prijzen_beschikbaar | string | lower == 'true' }}"
-            then:
-              - alias: >-
-                  The optimised number of most expensive periods, widened from 10 up to 21 within
-                  the Z/ZD search window when one is set and otherwise within the whole day
-                variables:
-                  optimal_periods: >-
-                    {% set opt = state_attr('sensor.dynamic_trading_power_optimisation', 'optimisation') or {} %}
-                    {{ opt.get('d', 0) | int(0) }}
-              - alias: Discharge power from y = 25569x^-0.935, capped at the maximum discharge power
-                variables:
-                  optimal_power: >-
-                    {% set x = optimal_periods | int %}
-                    {{ [ (25569 * x ** -0.935) | round(0) | int,
-                    states('input_number.zendure_setting_max_discharge_power') | int(12000) ] | min
-                    if x > 0 else 0 }}
-              - alias: Set the optimised number of most expensive periods for today
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamic_highest_price_x_period
-                data:
-                  value: "{{ optimal_periods | int }}"
-              - alias: Set the dynamic discharge power for today
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamic_discharge_power
-                data:
-                  value: "{{ optimal_power | int }}"
-              - action: logbook.log
-                data:
-                  message: >-
-                    ⚙️Dynamic discharge power optimised to {{ optimal_power | int }} watt over the
-                    {{ optimal_periods | int }} most expensive periods —
-                  entity_id: input_select.zendure_operation_mode
-                  name: " "
-            else:
-              - alias: >-
-                  Optimisation disabled, the day pinned with absolute manual periods or no prices
-                  for today, clear the discharge power so Dynamic Trading falls back to the maximum
-                  discharge power
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamic_discharge_power
                 data:
                   value: 0
         alias: Set dynamic manual periods from tomorrow into today
@@ -2084,7 +2016,7 @@ actions:
               sn: "{{ states('sensor.zendure_serial_number') }}"
               inputLimit: >-
                 {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
-                and is_state('input_boolean.dynamic_setting_trading_charge_power_optimisation', 'on')
+                and is_state('input_boolean.dynamic_setting_charge_power_optimisation', 'on')
                 and states('input_number.dynamic_charge_power') | float(0) > 0 %}
                 {{ states('input_number.dynamic_charge_power') | int(0) if optimised
                 else states('input_number.zendure_setting_max_charge_power') | int(0) }}
@@ -2092,7 +2024,7 @@ actions:
             data:
               message: >-
                 {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
-                and is_state('input_boolean.dynamic_setting_trading_charge_power_optimisation', 'on')
+                and is_state('input_boolean.dynamic_setting_charge_power_optimisation', 'on')
                 and states('input_number.dynamic_charge_power') | float(0) > 0 %}
                 💲Dynamic cheap charging started at {{ states('input_number.dynamic_charge_power') | int(0)
                 if optimised else states('input_number.zendure_setting_max_charge_power') | int(0) }} watt —
@@ -2204,26 +2136,15 @@ actions:
               minutes: 0
               seconds: 5
               milliseconds: 0
-          - alias: >-
-              Discharge at the optimised dynamic discharge power during Dynamic Trading, otherwise
-              at the maximum discharge power
-            action: rest_command.zendure_quick_discharge
+          - action: rest_command.zendure_quick_discharge
             data:
               sn: "{{ states('sensor.zendure_serial_number') }}"
               outputLimit: >-
-                {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
-                and is_state('input_boolean.dynamic_setting_trading_discharge_power_optimisation', 'on')
-                and states('input_number.dynamic_discharge_power') | float(0) > 0 %}
-                {{ states('input_number.dynamic_discharge_power') | int(0) if optimised
-                else states('input_number.zendure_setting_max_discharge_power') | int(0) }}
+                {{ states('input_number.zendure_setting_max_discharge_power') |
+                int(0) }}
           - action: logbook.log
             data:
-              message: >-
-                {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
-                and is_state('input_boolean.dynamic_setting_trading_discharge_power_optimisation', 'on')
-                and states('input_number.dynamic_discharge_power') | float(0) > 0 %}
-                💲Dynamic expensive discharge started at {{ states('input_number.dynamic_discharge_power') | int(0)
-                if optimised else states('input_number.zendure_setting_max_discharge_power') | int(0) }} watt —
+              message: 💲Dynamic expensive discharge started —
               entity_id: input_select.zendure_operation_mode
               name: " "
           - wait_for_trigger:
