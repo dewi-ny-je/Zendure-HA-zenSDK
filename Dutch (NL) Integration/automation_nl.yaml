@@ -1403,7 +1403,20 @@ actions:
             condition: template
             value_template: |
               {{ states('sensor.zendure_2400_ac_ingesteld_ontlaadvermogen') | int(0) > 0 }}
-          - alias: Het (beschermings)opladen niet onderbreken
+          - alias: >-
+              Het minimale laadpercentage overlaten aan de SOC bescherming
+              zolang die de batterij (bij)laadt
+            condition: or
+            conditions:
+              - condition: state
+                entity_id: input_boolean.zendure_2400_ac_soc_bescherming_uitgeschakeld
+                state:
+                  - "on"
+              - condition: template
+                value_template: |
+                  {{ states('sensor.zendure_2400_ac_laadpercentage') | float(0) >=
+                     states('sensor.zendure_2400_ac_minimale_laadpercentage') | float(0) }}
+          - alias: Het reeds lopende opladen niet onderbreken
             condition: numeric_state
             entity_id: sensor.zendure_2400_ac_vermogen_aansturing
             below: 30

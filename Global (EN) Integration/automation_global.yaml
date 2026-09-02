@@ -1383,7 +1383,20 @@ actions:
             condition: template
             value_template: |
               {{ states('sensor.zendure_set_discharge_power') | int(0) > 0 }}
-          - alias: Do not interrupt (protection) charging
+          - alias: >-
+              Leave the minimum SOC to the SOC protection while that is
+              (re)charging the battery
+            condition: or
+            conditions:
+              - condition: state
+                entity_id: input_boolean.zendure_setting_soc_protection_disabled
+                state:
+                  - "on"
+              - condition: template
+                value_template: |
+                  {{ states('sensor.zendure_total_state_of_charge') | float(0) >=
+                     states('sensor.zendure_minimum_state_of_charge') | float(0) }}
+          - alias: Do not interrupt charging that is already running
             condition: numeric_state
             entity_id: sensor.zendure_power
             below: 30
