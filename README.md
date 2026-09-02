@@ -18,7 +18,11 @@ Choose your preferred language
 	* timeslots found in the next day are plotted in a different colour
 * Dutch and Global version has discrepancies, now they have been brought in agreement
 * Apexcharts recently changed default settings, so I made x-axis tooltips explicitly active, so I can use my more modern [apexcharts-card integration](https://github.com/dewi-ny-je/apexcharts-card)
-* Feature to automatically have "Dynamic trading" optimise the number of charging timeslots, to increase them and lower the charge power accordingly (therefore higher efficiency and RTE) when this doesn't impact signitficantly the average purchase price. This feature is extremely specific to each battery, so values (for Solarflow 3000 Mix AC) are hardcoded.
+* "Dynamic trading power optimisation": two independent features that have "Dynamic trading" optimise the number of timeslots, increasing them and lowering the power accordingly (therefore higher efficiency and RTE) when this doesn't impact significantly the average price
+	* "Trading charge power optimisation" widens the cheapest timeslots from 11 up to 23 (3000 down to 1500 W) as long as the average purchase price stays within 2% of the average over the 11 cheapest ones
+	* "Trading discharge power optimisation" widens the most expensive timeslots from 10 up to 21 (3000 down to 1500 W) as long as the average sale price stays within 2% of the average over the 10 most expensive ones
+	* both search within the Z/ZD/ZG window when one is set, and over the whole day otherwise, so the optimised count always matches the timeslots the planner can actually pick; a day pinned with absolute "G/D" periods skips the optimisation, while the "+"/"-" modifiers do not
+	* this feature is extremely specific to each battery, so values (for Solarflow 3000 Mix AC) are hardcoded
 
 The additional features introduced are copyrighted by @dewi-ny-je, the original features are copyrighted by @Gielz1986
 

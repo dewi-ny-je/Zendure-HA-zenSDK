@@ -84,7 +84,19 @@ views:
                 entity: input_select.zendure_operation_mode
                 state: Dynamic Trading
               - condition: state
-                entity: input_boolean.dynamic_setting_charge_power_optimisation
+                entity: input_boolean.dynamic_setting_trading_charge_power_optimisation
+                state: "on"
+          - type: entities
+            entities:
+              - entity: input_number.dynamic_discharge_power
+                name: Discharge Power
+                secondary_info: last-changed
+            visibility:
+              - condition: state
+                entity: input_select.zendure_operation_mode
+                state: Dynamic Trading
+              - condition: state
+                entity: input_boolean.dynamic_setting_trading_discharge_power_optimisation
                 state: "on"
           - type: custom:apexcharts-card
             experimental:
@@ -2941,17 +2953,35 @@ views:
               correctly.
 
 
-              With **Charge Power Optimisation⚙️** enabled, every night the
-              number of cheapest periods is widened from 11 up to 23 for as long
-              as the average price over those periods stays within 2% of the
-              average over the 11 cheapest periods. The resulting period count is written to
-              **Lowest Price Periods** and the matching charge power to
-              **Dynamic Charge Power**, which Dynamic Trading then charges at
-              instead of the maximum charge power. Discharging keeps using the
-              maximum discharge power. Pinning the day with absolute manual
-              periods (**G14:00** style) takes precedence and skips the
-              optimisation; carried-over periods and **+**/**-** overrides do
-              not, since those still leave the period count in charge.
+              **Dynamic Trading Power Optimisation** trades power for periods, every
+              night, so that the same energy is moved more slowly and therefore
+              more efficiently.
+
+
+              With **Trading Charge Power Optimisation⚙️** enabled the number of
+              cheapest periods is widened from 11 up to 23 for as long as the
+              average price over those periods stays within 2% of the average
+              over the 11 cheapest periods. The resulting period count is
+              written to **Lowest Price Periods** and the matching charge power
+              to **Dynamic Charge Power**, which Dynamic Trading then charges at
+              instead of the maximum charge power.
+
+
+              With **Trading Discharge Power Optimisation⚙️** enabled the same
+              happens on the selling side: the number of most expensive periods
+              is widened from 10 up to 21 for as long as the average price over
+              those periods stays within 2% of the average over the 10 most
+              expensive periods, written to **Highest Price Periods** and
+              **Dynamic Discharge Power**.
+
+
+              Both optimisations search within the **Z**/**ZG**/**ZD** window
+              when one is set for today, and over the whole day otherwise, so
+              the period count always matches the periods the planner can
+              actually pick. Pinning the day with absolute manual periods
+              (**G14:00** style) takes precedence and skips both optimisations;
+              carried-over periods and **+**/**-** overrides do not, since those
+              still leave the period count in charge.
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
@@ -2969,8 +2999,10 @@ views:
                 name: Minimal Spread
               - entity: input_boolean.dynamic_setting_15_minute_interval
                 name: 15 Minute Interval
-              - entity: input_boolean.dynamic_setting_charge_power_optimisation
-                name: Charge Power Optimisation
+              - entity: input_boolean.dynamic_setting_trading_charge_power_optimisation
+                name: Trading Charge Power Optimisation
+              - entity: input_boolean.dynamic_setting_trading_discharge_power_optimisation
+                name: Trading Discharge Power Optimisation
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_dynamic

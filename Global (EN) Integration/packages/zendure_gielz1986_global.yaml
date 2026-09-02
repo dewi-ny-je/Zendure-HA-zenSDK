@@ -25,8 +25,12 @@ input_boolean:
     name: Dynamic 15 Minutes Interval
     icon: mdi:clock-time-three-outline
 
-  dynamic_setting_charge_power_optimisation:
-    name: Dynamic Charge Power Optimisation
+  dynamic_setting_trading_charge_power_optimisation:
+    name: Dynamic Trading Charge Power Optimisation
+    icon: mdi:auto-fix
+
+  dynamic_setting_trading_discharge_power_optimisation:
+    name: Dynamic Trading Discharge Power Optimisation
     icon: mdi:auto-fix
 
   dynamic_recently_charged:
@@ -236,6 +240,15 @@ input_number:
   dynamic_charge_power:
     name: Dynamic Charge Power
     icon: mdi:battery-charging-medium
+    min: 0
+    max: 12000
+    step: 1
+    mode: box
+    unit_of_measurement: "W"
+
+  dynamic_discharge_power:
+    name: Dynamic Discharge Power
+    icon: mdi:battery-arrow-down
     min: 0
     max: 12000
     step: 1
@@ -845,6 +858,109 @@ template:
                  'cd': plan_v.d | reject('in', vs) | list,
                  'mg': plan_m.g,
                  'md': plan_m.d} | to_json -}}
+
+      - name: "Dynamic Trading Power Optimisation"
+        unique_id: dynamic_trading_power_optimisation
+        icon: mdi:auto-fix
+        state: >-
+          {{ 'Yes' if (state_attr('sensor.dynamic_nordpool', 'raw_today') or []) | count >= 11 else 'No' }}
+        attributes:
+          optimisation: >-
+            {#- Same parser as sensor.dynamic_period_planning, duplicated because Jinja macros
+                cannot be shared between template entities. -#}
+            {%- macro zen_parse(txt) -%}
+              {%- set ns = namespace(items=[]) -%}
+              {%- for deel in txt.split(';') -%}
+                {%- set t = deel | trim | replace(' ', '') | upper -%}
+                {%- if t | length > 0 -%}
+                  {%- if t | regex_match('^\+?Z[GD]?[0-9]{1,2}:[0-9]{2}-[0-9]{1,2}:[0-9]{2}V?$') -%}
+                    {%- set plus = t[0] == '+' -%}
+                    {%- set b1 = t[1:] if plus else t -%}
+                    {%- set vast = b1[-1] == 'V' -%}
+                    {%- set b2 = b1[:-1] if vast else b1 -%}
+                    {%- set kind = b2[1] if b2[1] in ['G', 'D'] else 'B' -%}
+                    {%- set rng = (b2[1:] if kind == 'B' else b2[2:]).split('-') -%}
+                    {%- set a = '%02d:%s' % (rng[0].split(':')[0] | int, rng[0].split(':')[1]) -%}
+                    {%- set b = '%02d:%s' % (rng[1].split(':')[0] | int, rng[1].split(':')[1]) -%}
+                    {%- set ns.items = ns.items + [{'k': 'z', 'kind': kind, 'a': a, 'b': b, 'nd': (plus or b <= a), 'vast': vast, 'tok': t}] -%}
+                  {%- elif t | regex_match('^[+-][GD][0-9]{1,2}:[0-9]{2}(-[0-9]{1,2}:[0-9]{2})?$') -%}
+                    {%- set ns.items = ns.items + [{'k': 'm', 'tok': t}] -%}
+                  {%- elif t | regex_match('^[GD][0-9]{1,2}:[0-9]{2}(-[0-9]{1,2}:[0-9]{2})?$') -%}
+                    {%- set ns.items = ns.items + [{'k': 'a', 'tok': t}] -%}
+                  {%- else -%}
+                    {%- set ns.items = ns.items + [{'k': 'x', 'tok': t}] -%}
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {{- ns.items | to_json -}}
+            {%- endmacro -%}
+            {#- The prices the planner can actually pick from: the Z/ZG/ZD windows when they are
+                set, otherwise today as a whole. Mirrors the pool selection of zen_plan. -#}
+            {%- macro zen_pool(eigen, extra, P, soort) -%}
+              {%- if eigen | count == 0 -%}
+                {{- [] | to_json -}}
+              {%- else -%}
+                {%- set basis = eigen[0].start | as_datetime -%}
+                {%- set tz = basis.tzinfo -%}
+                {%- set dag = basis.strftime('%Y-%m-%d') -%}
+                {%- set alle = eigen + extra -%}
+                {%- set vensters = P | selectattr('k', 'eq', 'z') | selectattr('kind', 'in', ['B', soort]) | list -%}
+                {%- set pool = namespace(l=[]) -%}
+                {%- if vensters | count > 0 -%}
+                  {%- for u in alle -%}
+                    {%- set us = u.start | as_datetime -%}
+                    {%- set raak = namespace(v=false) -%}
+                    {%- for w in vensters -%}
+                      {%- set ws = strptime(dag ~ ' ' ~ w.a, '%Y-%m-%d %H:%M').replace(tzinfo=tz) -%}
+                      {%- set w0 = strptime(dag ~ ' ' ~ w.b, '%Y-%m-%d %H:%M').replace(tzinfo=tz) -%}
+                      {%- set we = w0 + timedelta(days=1) if w.nd else w0 -%}
+                      {%- if us >= ws and us < we -%}
+                        {%- set raak.v = true -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                    {%- if raak.v -%}
+                      {%- set pool.l = pool.l + [u.value | float(0)] -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- else -%}
+                  {%- set pool.l = eigen | map(attribute='value') | map('float') | list -%}
+                {%- endif -%}
+                {{- pool.l | to_json -}}
+              {%- endif -%}
+            {%- endmacro -%}
+            {#- Widen the selection from n_min up to n_max periods and keep the last count whose
+                average price stays within 2% of the average over the n_min best periods. -#}
+            {%- macro zen_optimum(waarden, n_min, n_max) -%}
+              {%- set aantal = waarden | count -%}
+              {%- if aantal == 0 -%}
+                {{- 0 -}}
+              {%- else -%}
+                {%- set n0 = [n_min, aantal] | min -%}
+                {%- set basis = (waarden[:n0] | sum) / n0 -%}
+                {%- set drempel = 0.02 * (basis | abs) -%}
+                {%- set maxn = [n_max, aantal] | min -%}
+                {%- set ns = namespace(gekozen=maxn, gevonden=false) -%}
+                {%- for x in range(n0 + 1, maxn + 1) -%}
+                  {%- if not ns.gevonden and (((waarden[:x] | sum) / x - basis) | abs) > drempel -%}
+                    {%- set ns.gekozen = x - 1 -%}
+                    {%- set ns.gevonden = true -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {{- ns.gekozen -}}
+              {%- endif -%}
+            {%- endmacro -%}
+            {%- set vandaag = state_attr('sensor.dynamic_nordpool', 'raw_today') or [] -%}
+            {%- set morgen = state_attr('sensor.dynamic_nordpool', 'raw_tomorrow') or [] -%}
+            {%- set tv = states('input_text.dynamic_manual_period') -%}
+            {%- set tv = '' if tv in ['unknown', 'unavailable'] else tv -%}
+            {%- set P = zen_parse(tv) | from_json -%}
+            {%- set g_pool = zen_pool(vandaag, morgen, P, 'G') | from_json | sort -%}
+            {%- set d_pool = zen_pool(vandaag, morgen, P, 'D') | from_json | sort(reverse=true) -%}
+            {{- {'g': zen_optimum(g_pool, 11, 23) | trim | int(0),
+                 'd': zen_optimum(d_pool, 10, 21) | trim | int(0),
+                 'gn': g_pool | count,
+                 'dn': d_pool | count,
+                 'vast': (P | selectattr('k', 'eq', 'a') | list | count > 0)} | to_json -}}
 
       - name: "Dynamic Next Day Manual Period"
         unique_id: dynamic_next_day_manual_period
