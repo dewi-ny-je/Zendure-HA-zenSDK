@@ -403,9 +403,9 @@ actions:
                     value_template: >-
                       {{ has_value('sensor.zendure_inverter_max_charge_power')
                       and has_value('input_number.zendure_setting_max_charge_power')
-                      and states('sensor.zendure_inverter_max_charge_power') | round(1) |
+                      and states('sensor.zendure_inverter_max_charge_power') |
                       float(0) !=
-                      states('input_number.zendure_setting_max_charge_power') | round(1) |
+                      states('input_number.zendure_setting_max_charge_power') |
                       float(0) }}
                   - condition: trigger
                     id:
@@ -444,10 +444,10 @@ actions:
                     value_template: >-
                       {{ has_value('sensor.zendure_inverter_max_discharge_power')
                       and has_value('input_number.zendure_setting_max_discharge_power')
-                      and states('sensor.zendure_inverter_max_discharge_power') | round(1) |
+                      and states('sensor.zendure_inverter_max_discharge_power') |
                       float(0) !=
                       states('input_number.zendure_setting_max_discharge_power')
-                      | round(1) | float(0) }}
+                      | float(0) }}
                   - condition: trigger
                     id:
                       - aansturing_trigger
@@ -485,10 +485,10 @@ actions:
                     value_template: >-
                       {{ has_value('sensor.zendure_minimum_state_of_charge')
                       and has_value('input_number.zendure_setting_minimum_allowed_state_of_charge')
-                      and states('sensor.zendure_minimum_state_of_charge') | round(1) |
+                      and states('sensor.zendure_minimum_state_of_charge') |
                       float(0) !=
                       states('input_number.zendure_setting_minimum_allowed_state_of_charge')
-                      | round(1) | float(0) }}
+                      | float(0) }}
                   - condition: trigger
                     id:
                       - aansturing_trigger
@@ -527,10 +527,10 @@ actions:
                     value_template: >-
                       {{ has_value('sensor.zendure_maximum_state_of_charge')
                       and has_value('input_number.zendure_setting_maximum_allowed_state_of_charge')
-                      and states('sensor.zendure_maximum_state_of_charge') | round(1) |
+                      and states('sensor.zendure_maximum_state_of_charge') |
                       float(0) !=
                       states('input_number.zendure_setting_maximum_allowed_state_of_charge')
-                      | round(1) | float(0) }}
+                      | float(0) }}
                   - condition: trigger
                     id:
                       - aansturing_trigger

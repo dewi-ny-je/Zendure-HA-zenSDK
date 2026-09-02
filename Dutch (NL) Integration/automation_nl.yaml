@@ -405,9 +405,9 @@ actions:
                       and has_value('input_number.zendure_2400_ac_max_oplaadvermogen')
                       and
                       states('sensor.zendure_2400_ac_omvormer_max_oplaadvermogen')
-                      | round(1) | float(0) !=
+                      | float(0) !=
                       states('input_number.zendure_2400_ac_max_oplaadvermogen')
-                      | round(1) | float(0) }}
+                      | float(0) }}
                   - condition: trigger
                     id:
                       - aansturing_trigger
@@ -447,9 +447,9 @@ actions:
                       and has_value('input_number.zendure_2400_ac_max_ontlaadvermogen')
                       and
                       states('sensor.zendure_2400_ac_omvormer_max_ontlaadvermogen')
-                      | round(1) | float(0) !=
+                      | float(0) !=
                       states('input_number.zendure_2400_ac_max_ontlaadvermogen')
-                      | round(1) | float(0) }}
+                      | float(0) }}
                   - condition: trigger
                     id:
                       - aansturing_trigger
@@ -488,10 +488,10 @@ actions:
                       {{ has_value('sensor.zendure_2400_ac_minimale_laadpercentage')
                       and has_value('input_number.zendure_2400_ac_minimaal_toegestaan_laadpercentage')
                       and
-                      states('sensor.zendure_2400_ac_minimale_laadpercentage') | round(1) |
+                      states('sensor.zendure_2400_ac_minimale_laadpercentage') |
                       float(0) !=
                       states('input_number.zendure_2400_ac_minimaal_toegestaan_laadpercentage')
-                      | round(1) | float(0) }}
+                      | float(0) }}
                   - condition: trigger
                     id:
                       - aansturing_trigger
@@ -531,10 +531,10 @@ actions:
                       {{ has_value('sensor.zendure_2400_ac_maximale_laadpercentage')
                       and has_value('input_number.zendure_2400_ac_maximaal_toegestaan_laadpercentage')
                       and
-                      states('sensor.zendure_2400_ac_maximale_laadpercentage') | round(1) |
+                      states('sensor.zendure_2400_ac_maximale_laadpercentage') |
                       float(0) !=
                       states('input_number.zendure_2400_ac_maximaal_toegestaan_laadpercentage')
-                      | round(1) | float(0) }}
+                      | float(0) }}
                   - condition: trigger
                     id:
                       - aansturing_trigger
