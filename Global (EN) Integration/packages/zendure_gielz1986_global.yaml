@@ -941,7 +941,7 @@ template:
         state: >
           {% set prijzen = state_attr('sensor.dynamic_nordpool', 'raw_today') %}
           {% set handmatige = states('input_text.dynamic_manual_period') %}
-          {% set aantal_duur = states('input_number.dynamic_highest_price_x_period') | int %}
+          {% set aantal_duur = states('input_number.dynamic_highest_price_x_period') | int(0) %}
           {% set kwartier = is_state('input_boolean.dynamic_setting_15_minute_interval', 'on') %}
           {% set default_delta = timedelta(minutes=15) if kwartier else timedelta(hours=1) %}
           {% if prijzen is iterable %}
@@ -1001,8 +1001,8 @@ template:
           raw_today: >
             {% set prijzen = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') %}
             {% set handmatige = states('input_text.dynamic_manual_period') %}
-            {% set aantal_goedkoop = states('input_number.dynamic_lowest_price_x_period') | int %}
-            {% set aantal_duur = states('input_number.dynamic_highest_price_x_period') | int %}
+            {% set aantal_goedkoop = states('input_number.dynamic_lowest_price_x_period') | int(0) %}
+            {% set aantal_duur = states('input_number.dynamic_highest_price_x_period') | int(0) %}
             {% if prijzen is iterable %}
               {% set ns = namespace(goede_starttijden=[], dure_starttijden=[]) %}
               {% if handmatige | length > 0 %}
@@ -1049,7 +1049,7 @@ template:
         state: >
           {% set prijzen = state_attr('sensor.dynamic_nordpool', 'raw_today') %}
           {% set handmatige = states('input_text.dynamic_manual_period') %}
-          {% set aantal_goedkoop = states('input_number.dynamic_lowest_price_x_period') | int %}
+          {% set aantal_goedkoop = states('input_number.dynamic_lowest_price_x_period') | int(0) %}
           {% set kwartier = is_state('input_boolean.dynamic_setting_15_minute_interval', 'on') %}
           {% set default_delta = timedelta(minutes=15) if kwartier else timedelta(hours=1) %}
           {% if prijzen is iterable %}
@@ -1105,8 +1105,8 @@ template:
           raw_today: >
             {% set prijzen = state_attr('sensor.dynamic_nordpool', 'raw_today') %}
             {% set handmatige = states('input_text.dynamic_manual_period') %}
-            {% set aantal_goedkoop = states('input_number.dynamic_lowest_price_x_period') | int %}
-            {% set aantal_duur = states('input_number.dynamic_highest_price_x_period') | int %}
+            {% set aantal_goedkoop = states('input_number.dynamic_lowest_price_x_period') | int(0) %}
+            {% set aantal_duur = states('input_number.dynamic_highest_price_x_period') | int(0) %}
             {% set kwartier = is_state('input_boolean.dynamic_setting_15_minute_interval', 'on') %}
             {% set default_delta = timedelta(minutes=15) if kwartier else timedelta(hours=1) %}
             {% if prijzen is iterable %}
@@ -1173,8 +1173,8 @@ template:
           raw_tomorrow: >
             {% set prijzen = state_attr('sensor.dynamic_nordpool', 'raw_tomorrow') %}
             {% set handmatige = states('input_text.dynamic_manual_period_tomorrow') %}
-            {% set aantal_goedkoop = states('input_number.dynamic_lowest_price_x_period_tomorrow') | int %}
-            {% set aantal_duur = states('input_number.dynamic_highest_price_x_period_tomorrow') | int %}
+            {% set aantal_goedkoop = states('input_number.dynamic_lowest_price_x_period_tomorrow') | int(0) %}
+            {% set aantal_duur = states('input_number.dynamic_highest_price_x_period_tomorrow') | int(0) %}
             {% set kwartier = is_state('input_boolean.dynamic_setting_15_minute_interval', 'on') %}
             {% set default_delta = timedelta(minutes=15) if kwartier else timedelta(hours=1) %}
             {% if prijzen is iterable %}
