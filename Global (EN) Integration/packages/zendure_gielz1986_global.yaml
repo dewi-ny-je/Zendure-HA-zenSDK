@@ -29,6 +29,10 @@ input_boolean:
     name: Dynamic Charge Power Optimisation
     icon: mdi:auto-fix
 
+  dynamic_setting_discharge_power_optimisation:
+    name: Dynamic Discharge Power Optimisation
+    icon: mdi:auto-fix
+
   dynamic_recently_charged:
     name: Dynamic Recently Charged
     icon: mdi:battery-check
@@ -236,6 +240,15 @@ input_number:
   dynamic_charge_power:
     name: Dynamic Charge Power
     icon: mdi:battery-charging-medium
+    min: 0
+    max: 12000
+    step: 1
+    mode: box
+    unit_of_measurement: "W"
+
+  dynamic_discharge_power:
+    name: Dynamic Discharge Power
+    icon: mdi:battery-arrow-down
     min: 0
     max: 12000
     step: 1

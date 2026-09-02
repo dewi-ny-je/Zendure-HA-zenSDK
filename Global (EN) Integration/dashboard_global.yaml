@@ -86,6 +86,18 @@ views:
               - condition: state
                 entity: input_boolean.dynamic_setting_charge_power_optimisation
                 state: "on"
+          - type: entities
+            entities:
+              - entity: input_number.dynamic_discharge_power
+                name: Discharge Power
+                secondary_info: last-changed
+            visibility:
+              - condition: state
+                entity: input_select.zendure_operation_mode
+                state: Dynamic Trading
+              - condition: state
+                entity: input_boolean.dynamic_setting_discharge_power_optimisation
+                state: "on"
           - type: custom:apexcharts-card
             experimental:
               hidden_by_default: true
@@ -2947,11 +2959,22 @@ views:
               average over the 11 cheapest periods. The resulting period count is written to
               **Lowest Price Periods** and the matching charge power to
               **Dynamic Charge Power**, which Dynamic Trading then charges at
-              instead of the maximum charge power. Discharging keeps using the
-              maximum discharge power. Pinning the day with absolute manual
-              periods (**G14:00** style) takes precedence and skips the
-              optimisation; carried-over periods and **+**/**-** overrides do
-              not, since those still leave the period count in charge.
+              instead of the maximum charge power.
+
+
+              **Discharge Power Optimisation⚙️** does the same on the other
+              side: the most expensive periods are widened from 10 up to 21
+              while their average price stays within 2% of the average over the
+              10 most expensive periods, writing **Highest Price Periods** and
+              **Dynamic Discharge Power**. Both switches work independently, and
+              anything they do not cover keeps using the maximum charge and
+              discharge power.
+
+
+              Pinning the day with absolute manual periods (**G14:00** style)
+              takes precedence and skips both optimisations; carried-over
+              periods and **+**/**-** overrides do not, since those still leave
+              the period counts in charge.
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help
@@ -2971,6 +2994,8 @@ views:
                 name: 15 Minute Interval
               - entity: input_boolean.dynamic_setting_charge_power_optimisation
                 name: Charge Power Optimisation
+              - entity: input_boolean.dynamic_setting_discharge_power_optimisation
+                name: Discharge Power Optimisation
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_dynamic
