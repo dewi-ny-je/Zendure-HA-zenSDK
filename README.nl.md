@@ -13,6 +13,7 @@
 	* tijdvakken die in de volgende dag worden gevonden, worden in een andere kleur weergegeven
 * De Nederlandse en de Global-versie weken van elkaar af; die zijn nu met elkaar in overeenstemming gebracht
 * Apexcharts heeft onlangs de standaardinstellingen gewijzigd, daarom heb ik de tooltips op de x-as expliciet ingeschakeld om [mijne Apexcharts](https://github.com/dewi-ny-je/apexcharts-card/) te kunnen gebruiken
+* Functie waarmee “Dynamic trading” automatisch het aantal laadtijdvakken optimaliseert: het aantal wordt verhoogd en het laadvermogen dienovereenkomstig verlaagd (wat leidt tot een hogere efficiëntie en RTE), mits dit geen significante invloed heeft op de gemiddelde aankoopprijs. Deze functie is uiterst specifiek voor elke accu, waardoor de waarden (voor Solarflow 3000 Mix AC) vast zijn geprogrammeerd.
 
 ![Preview](Images/NL-Dashboard-290526.gif)
 

@@ -18,6 +18,7 @@ Choose your preferred language
 	* timeslots found in the next day are plotted in a different colour
 * Dutch and Global version has discrepancies, now they have been brought in agreement
 * Apexcharts recently changed default settings, so I made x-axis tooltips explicitly active, so I can use my more modern [apexcharts-card integration](https://github.com/dewi-ny-je/apexcharts-card)
+* Feature to automatically have "Dynamic trading" optimise the number of charging timeslots, to increase them and lower the charge power accordingly (therefore higher efficiency and RTE) when this doesn't impact signitficantly the average purchase price. This feature is extremely specific to each battery, so values (for Solarflow 3000 Mix AC) are hardcoded.
 
 The additional features introduced are copyrighted by @dewi-ny-je, the original features are copyrighted by @Gielz1986
 
