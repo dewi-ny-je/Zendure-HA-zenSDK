@@ -86,6 +86,18 @@ views:
               - condition: state
                 entity: input_boolean.dynamisch_oplaadvermogen_optimalisatie
                 state: "on"
+          - type: entities
+            entities:
+              - entity: input_number.dynamisch_ontlaadvermogen
+                name: Ontlaadvermogen
+                secondary_info: last-changed
+            visibility:
+              - condition: state
+                entity: input_select.zendure_2400_ac_modus_selecteren
+                state: Dynamisch Handelen
+              - condition: state
+                entity: input_boolean.dynamisch_ontlaadvermogen_optimalisatie
+                state: "on"
           - type: custom:apexcharts-card
             experimental:
               hidden_by_default: true
@@ -2955,12 +2967,22 @@ views:
               over de 11 goedkoopste periodes blijft. Het gevonden aantal komt in **Goedkoopste
               Periodes** te staan en het bijbehorende vermogen in **Dynamisch
               Oplaadvermogen**, waarmee Dynamisch Handelen laadt in plaats van
-              met het maximale oplaadvermogen. Ontladen blijft op het maximale
-              ontlaadvermogen. Zet je de dag vast met absolute handmatige
-              periodes (stijl **G14:00**), dan gaat dat voor en wordt de
-              optimalisatie overgeslagen; overgedragen periodes en
-              **+**/**-**-correcties niet, want daarbij blijft het aantal
-              periodes leidend.
+              met het maximale oplaadvermogen.
+
+
+              **Ontlaadvermogen Optimalisatie⚙️** doet hetzelfde aan de andere
+              kant: de duurste periodes worden uitgebreid van 10 tot 21 zolang
+              hun gemiddelde prijs binnen 2% van het gemiddelde over de 10
+              duurste periodes blijft, met **Duurste Periodes** en **Dynamisch
+              Ontlaadvermogen** als resultaat. Beide schakelaars werken
+              onafhankelijk van elkaar; wat ze niet afdekken blijft op het
+              maximale op- en ontlaadvermogen.
+
+
+              Zet je de dag vast met absolute handmatige periodes (stijl
+              **G14:00**), dan gaat dat voor en worden beide optimalisaties
+              overgeslagen; overgedragen periodes en **+**/**-**-correcties
+              niet, want daarbij blijft het aantal periodes leidend.
             text_only: true
             visibility:
               - condition: state
@@ -2980,6 +3002,8 @@ views:
                 name: 15 Minuten Tarieven Actief
               - entity: input_boolean.dynamisch_oplaadvermogen_optimalisatie
                 name: Oplaadvermogen Optimalisatie
+              - entity: input_boolean.dynamisch_ontlaadvermogen_optimalisatie
+                name: Ontlaadvermogen Optimalisatie
             visibility:
               - condition: state
                 entity: input_boolean.dynamisch_tonen_op_dashboard

@@ -29,6 +29,10 @@ input_boolean:
     name: Dynamisch Oplaadvermogen Optimalisatie
     icon: mdi:auto-fix
 
+  dynamisch_ontlaadvermogen_optimalisatie:
+    name: Dynamisch Ontlaadvermogen Optimalisatie
+    icon: mdi:auto-fix
+
   dynamisch_recent_geladen:
     name: Dynamisch Recent Geladen
     icon: mdi:battery-check
@@ -236,6 +240,15 @@ input_number:
   dynamisch_oplaadvermogen:
     name: Dynamisch Oplaadvermogen
     icon: mdi:battery-charging-medium
+    min: 0
+    max: 12000
+    step: 1
+    mode: box
+    unit_of_measurement: "W"
+
+  dynamisch_ontlaadvermogen:
+    name: Dynamisch Ontlaadvermogen
+    icon: mdi:battery-arrow-down
     min: 0
     max: 12000
     step: 1
