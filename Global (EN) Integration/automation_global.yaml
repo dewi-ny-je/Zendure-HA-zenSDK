@@ -1724,17 +1724,17 @@ actions:
                     target:
                       entity_id: input_number.dynamic_lowest_price_x_period
                     data:
-                      value: "{{ opt.G_periods | int }}"
+                      value: "{{ opt.G_periods | int(0) }}"
                   - alias: Set the dynamic charge power for today
                     action: input_number.set_value
                     target:
                       entity_id: input_number.dynamic_charge_power
                     data:
-                      value: "{{ opt.G_power | int }}"
+                      value: "{{ opt.G_power | int(0) }}"
                   - action: logbook.log
                     data:
                       message: >-
-                        ⚙️Dynamic charge power optimised to {{ opt.G_power | int }} watt over the {{ opt.G_periods | int }} cheapest periods ({{ opt.G_slots | int }} slots) —
+                        ⚙️Dynamic charge power optimised to {{ opt.G_power | int(0) }} watt over the {{ opt.G_periods | int(0) }} cheapest periods ({{ opt.G_slots | int(0) }} slots) —
                       entity_id: input_select.zendure_operation_mode
                       name: " "
                 else:
@@ -1793,17 +1793,17 @@ actions:
                     target:
                       entity_id: input_number.dynamic_highest_price_x_period
                     data:
-                      value: "{{ opt.D_periods | int }}"
+                      value: "{{ opt.D_periods | int(0) }}"
                   - alias: Set the dynamic discharge power for today
                     action: input_number.set_value
                     target:
                       entity_id: input_number.dynamic_discharge_power
                     data:
-                      value: "{{ opt.D_power | int }}"
+                      value: "{{ opt.D_power | int(0) }}"
                   - action: logbook.log
                     data:
                       message: >-
-                        ⚙️Dynamic discharge power optimised to {{ opt.D_power | int }} watt over the {{ opt.D_periods | int }} most expensive periods ({{ opt.D_slots | int }} slots) —
+                        ⚙️Dynamic discharge power optimised to {{ opt.D_power | int(0) }} watt over the {{ opt.D_periods | int(0) }} most expensive periods ({{ opt.D_slots | int(0) }} slots) —
                       entity_id: input_select.zendure_operation_mode
                       name: " "
                 else:
@@ -2238,8 +2238,8 @@ actions:
                 {% set optimised = is_state('input_select.zendure_operation_mode', 'Dynamic Trading')
                 and is_state('input_boolean.dynamic_setting_discharge_power_optimisation', 'on')
                 and states('input_number.dynamic_discharge_power') | float(0) > 0 %}
-                💲Dynamic expensive discharge started at {{ states('input_number.dynamic_discharge_power') | int
-                if optimised else states('input_number.zendure_setting_max_discharge_power') | int }} watt —
+                💲Dynamic expensive discharge started at {{ states('input_number.dynamic_discharge_power') | int(0)
+                if optimised else states('input_number.zendure_setting_max_discharge_power') | int(0) }} watt —
               entity_id: input_select.zendure_operation_mode
               name: " "
           - wait_for_trigger:

@@ -1746,17 +1746,17 @@ actions:
                     target:
                       entity_id: input_number.dynamisch_goedkoopste_x_periode
                     data:
-                      value: "{{ opt.G_periods | int }}"
+                      value: "{{ opt.G_periods | int(0) }}"
                   - alias: Zet het dynamische oplaadvermogen voor vandaag
                     action: input_number.set_value
                     target:
                       entity_id: input_number.dynamisch_oplaadvermogen
                     data:
-                      value: "{{ opt.G_power | int }}"
+                      value: "{{ opt.G_power | int(0) }}"
                   - action: logbook.log
                     data:
                       message: >-
-                        ⚙️Dynamisch oplaadvermogen geoptimaliseerd naar {{ opt.G_power | int }} watt over de {{ opt.G_periods | int }} goedkoopste periodes ({{ opt.G_slots | int }} slots) —
+                        ⚙️Dynamisch oplaadvermogen geoptimaliseerd naar {{ opt.G_power | int(0) }} watt over de {{ opt.G_periods | int(0) }} goedkoopste periodes ({{ opt.G_slots | int(0) }} slots) —
                       entity_id: input_select.zendure_2400_ac_modus_selecteren
                       name: " "
                 else:
@@ -1815,17 +1815,17 @@ actions:
                     target:
                       entity_id: input_number.dynamisch_duurste_x_periode
                     data:
-                      value: "{{ opt.D_periods | int }}"
+                      value: "{{ opt.D_periods | int(0) }}"
                   - alias: Zet het dynamische ontlaadvermogen voor vandaag
                     action: input_number.set_value
                     target:
                       entity_id: input_number.dynamisch_ontlaadvermogen
                     data:
-                      value: "{{ opt.D_power | int }}"
+                      value: "{{ opt.D_power | int(0) }}"
                   - action: logbook.log
                     data:
                       message: >-
-                        ⚙️Dynamisch ontlaadvermogen geoptimaliseerd naar {{ opt.D_power | int }} watt over de {{ opt.D_periods | int }} duurste periodes ({{ opt.D_slots | int }} slots) —
+                        ⚙️Dynamisch ontlaadvermogen geoptimaliseerd naar {{ opt.D_power | int(0) }} watt over de {{ opt.D_periods | int(0) }} duurste periodes ({{ opt.D_slots | int(0) }} slots) —
                       entity_id: input_select.zendure_2400_ac_modus_selecteren
                       name: " "
                 else:
@@ -2263,8 +2263,8 @@ actions:
                 {% set optimised = is_state('input_select.zendure_2400_ac_modus_selecteren', 'Dynamisch Handelen')
                 and is_state('input_boolean.dynamisch_ontlaadvermogen_optimalisatie', 'on')
                 and states('input_number.dynamisch_ontlaadvermogen') | float(0) > 0 %}
-                💲Dynamisch duur ontladen gestart op {{ states('input_number.dynamisch_ontlaadvermogen') | int
-                if optimised else states('input_number.zendure_2400_ac_max_ontlaadvermogen') | int }} watt —
+                💲Dynamisch duur ontladen gestart op {{ states('input_number.dynamisch_ontlaadvermogen') | int(0)
+                if optimised else states('input_number.zendure_2400_ac_max_ontlaadvermogen') | int(0) }} watt —
               entity_id: input_select.zendure_2400_ac_modus_selecteren
               name: " "
           - wait_for_trigger:
