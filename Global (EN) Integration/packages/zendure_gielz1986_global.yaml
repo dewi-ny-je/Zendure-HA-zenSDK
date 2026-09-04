@@ -859,6 +859,150 @@ template:
                  'mg': plan_m.g,
                  'md': plan_m.d} | to_json -}}
 
+      - name: "Dynamic Power Optimisation"
+        unique_id: dynamic_power_optimisation
+        icon: mdi:auto-fix
+        state: >-
+          {{- (state_attr('sensor.dynamic_nordpool', 'raw_today') or []) | count -}}
+        attributes:
+          optimisation: >-
+            {%- macro zen_parse(txt) -%}
+            {%- set ns = namespace(items=[]) -%}
+            {%- for deel in txt.split(';') -%}
+            {%- set t = deel | trim | replace(' ', '') | upper -%}
+            {%- if t | length > 0 -%}
+            {%- if t | regex_match('^\+?Z[GD]?[0-9]{1,2}:[0-9]{2}-[0-9]{1,2}:[0-9]{2}V?$') -%}
+            {%- set plus = t[0] == '+' -%}
+            {%- set b1 = t[1:] if plus else t -%}
+            {%- set vast = b1[-1] == 'V' -%}
+            {%- set b2 = b1[:-1] if vast else b1 -%}
+            {%- set kind = b2[1] if b2[1] in ['G', 'D'] else 'B' -%}
+            {%- set rng = (b2[1:] if kind == 'B' else b2[2:]).split('-') -%}
+            {%- set a = '%02d:%s' % (rng[0].split(':')[0] | int, rng[0].split(':')[1]) -%}
+            {%- set b = '%02d:%s' % (rng[1].split(':')[0] | int, rng[1].split(':')[1]) -%}
+            {%- set ns.items = ns.items + [{'k': 'z', 'kind': kind, 'a': a, 'b': b, 'nd': (plus or b <= a), 'vast': vast, 'tok': t}] -%}
+            {%- elif t | regex_match('^[+-][GD][0-9]{1,2}:[0-9]{2}(-[0-9]{1,2}:[0-9]{2})?$') -%}
+            {%- set rng = t[2:].split('-') -%}
+            {%- set a = '%02d:%s' % (rng[0].split(':')[0] | int, rng[0].split(':')[1]) -%}
+            {%- set b = ('%02d:%s' % (rng[1].split(':')[0] | int, rng[1].split(':')[1])) if rng | count > 1 else none -%}
+            {%- set ns.items = ns.items + [{'k': 'm', 'sign': t[0], 'type': t[1], 'a': a, 'b': b, 'tok': t}] -%}
+            {%- elif t | regex_match('^[GD][0-9]{1,2}:[0-9]{2}(-[0-9]{1,2}:[0-9]{2})?$') -%}
+            {%- set rng = t[1:].split('-') -%}
+            {%- set a = '%02d:%s' % (rng[0].split(':')[0] | int, rng[0].split(':')[1]) -%}
+            {%- set b = ('%02d:%s' % (rng[1].split(':')[0] | int, rng[1].split(':')[1])) if rng | count > 1 else none -%}
+            {%- set ns.items = ns.items + [{'k': 'a', 'type': t[0], 'a': a, 'b': b, 'tok': t}] -%}
+            {%- else -%}
+            {%- set ns.items = ns.items + [{'k': 'x', 'tok': t}] -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- endfor -%}
+            {{- ns.items | to_json -}}
+            {%- endmacro -%}
+            {%- macro zen_pool(alle, eigen, P, soort) -%}
+              {%- set zoek = P | selectattr('k', 'eq', 'z') | list -%}
+              {%- set vensters = zoek | selectattr('kind', 'in', ['B', soort]) | list -%}
+              {%- set basisdt = eigen[0].start | as_datetime -%}
+              {%- set tz = basisdt.tzinfo -%}
+              {%- set dag = basisdt.strftime('%Y-%m-%d') -%}
+              {%- set pool = namespace(l=[]) -%}
+              {%- if vensters | count > 0 -%}
+                {%- for u in alle -%}
+                  {%- set us = u.start | as_datetime -%}
+                  {%- set raak = namespace(v=false) -%}
+                  {%- for w in vensters -%}
+                    {%- set ws = strptime(dag ~ ' ' ~ w.a, '%Y-%m-%d %H:%M').replace(tzinfo=tz) -%}
+                    {%- set w0 = strptime(dag ~ ' ' ~ w.b, '%Y-%m-%d %H:%M').replace(tzinfo=tz) -%}
+                    {%- set we = w0 + timedelta(days=1) if w.nd else w0 -%}
+                    {%- if us >= ws and us < we -%}{%- set raak.v = true -%}{%- endif -%}
+                  {%- endfor -%}
+                  {%- if raak.v -%}{%- set pool.l = pool.l + [u] -%}{%- endif -%}
+                {%- endfor -%}
+              {%- else -%}
+                {%- set pool.l = eigen | list -%}
+              {%- endif -%}
+              {{- pool.l | sort(attribute='value') | map(attribute='start') | list | to_json -}}
+            {%- endmacro -%}
+            {%- macro zen_mods(P, eigen, slot_delta) -%}
+              {%- set basisdt = eigen[0].start | as_datetime -%}
+              {%- set tz = basisdt.tzinfo -%}
+              {%- set dag = basisdt.strftime('%Y-%m-%d') -%}
+              {%- set ns = namespace(l=[]) -%}
+              {%- for it in P if it.k == 'm' -%}
+                {%- set s_dt = strptime(dag ~ ' ' ~ it.a, '%Y-%m-%d %H:%M').replace(tzinfo=tz) -%}
+                {%- if it.b -%}
+                  {%- set e0 = strptime(dag ~ ' ' ~ it.b, '%Y-%m-%d %H:%M').replace(tzinfo=tz) -%}
+                  {%- set e_dt = (e0 + timedelta(days=1) if e0 <= s_dt else e0) + timedelta(seconds=1) -%}
+                {%- else -%}
+                  {%- set e_dt = s_dt + slot_delta -%}
+                {%- endif -%}
+                {%- set tr = namespace(l=[]) -%}
+                {%- for u in eigen -%}
+                  {%- if (u.start | as_datetime) < e_dt and (u.end | as_datetime) > s_dt -%}
+                    {%- set tr.l = tr.l + [u.start] -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- set ns.l = ns.l + [{'sign': it.sign, 'type': it.type, 'slots': tr.l}] -%}
+              {%- endfor -%}
+              {{- ns.l | to_json -}}
+            {%- endmacro -%}
+            {%- set kwartier = is_state('input_boolean.dynamic_setting_15_minute_interval', 'on') -%}
+            {%- set slot_delta = timedelta(minutes=15) if kwartier else timedelta(hours=1) -%}
+            {%- set vandaag = state_attr('sensor.dynamic_nordpool', 'raw_today') or [] -%}
+            {%- set morgen = state_attr('sensor.dynamic_nordpool', 'raw_tomorrow') or [] -%}
+            {%- set tv = states('input_text.dynamic_manual_period') -%}
+            {%- set tv = '' if tv in ['unknown', 'unavailable'] else tv -%}
+            {%- set P = zen_parse(tv) | from_json -%}
+            {%- set vast = P | selectattr('k', 'eq', 'a') | list -%}
+            {%- if vandaag | count == 0 or vast | count > 0 -%}
+              {{- {} | to_json -}}
+            {%- else -%}
+              {%- set alle = vandaag + morgen -%}
+              {%- set mods = zen_mods(P, vandaag, slot_delta) | from_json -%}
+              {%- set res = namespace(d={}) -%}
+              {%- for soort, laag, hoog in [('G', 11, 23), ('D', 10, 21)] -%}
+                {%- set pool = zen_pool(alle, vandaag, P, soort) | from_json -%}
+                {%- set maxn = [hoog, pool | count] | min -%}
+                {%- if maxn >= laag -%}
+                  {%- set tab = namespace(avg=[], eff=[]) -%}
+                  {%- for n in range(laag, maxn + 1) -%}
+                    {%- set base = pool[:n] if soort == 'G' else pool[-n:] -%}
+                    {%- set sel = namespace(l=base) -%}
+                    {%- for m in mods -%}
+                      {%- if m.sign == '+' and m.type == soort -%}
+                        {%- set sel.l = (sel.l + m.slots) | unique | list -%}
+                      {%- elif m.sign == '+' or m.type == soort -%}
+                        {%- set sel.l = sel.l | reject('in', m.slots) | list -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                    {%- set waarden = alle | selectattr('start', 'in', sel.l) | map(attribute='value') | list -%}
+                    {%- set tab.avg = tab.avg + [((waarden | sum) / (waarden | count)) if waarden | count > 0 else 0] -%}
+                    {%- set tab.eff = tab.eff + [waarden | count] -%}
+                  {%- endfor -%}
+                  {%- set basis = tab.avg[0] -%}
+                  {%- set drempel = 0.02 * (basis | abs) -%}
+                  {%- set kies = namespace(n=maxn, gevonden=false) -%}
+                  {%- for n in range(laag + 1, maxn + 1) -%}
+                    {%- set delta = (tab.avg[n - laag] - basis) if soort == 'G' else (basis - tab.avg[n - laag]) -%}
+                    {%- if not kies.gevonden and delta > drempel -%}
+                      {%- set kies.n = n - 1 -%}
+                      {%- set kies.gevonden = true -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                  {%- set eff = tab.eff[kies.n - laag] -%}
+                  {%- if soort == 'G' -%}
+                    {%- set vermogen = [(6.3131 * eff * eff - 341.16 * eff + 6002.5) | round(0) | int,
+                        states('input_number.zendure_setting_max_charge_power') | int(12000)] | min -%}
+                  {%- else -%}
+                    {%- set vermogen = [(25569 * (eff ** -0.935)) | round(0) | int,
+                        states('input_number.zendure_setting_max_discharge_power') | int(12000)] | min -%}
+                  {%- endif -%}
+                  {%- set res.d = dict(res.d, **{soort ~ '_periods': kies.n, soort ~ '_slots': eff,
+                      soort ~ '_power': vermogen, soort ~ '_pool': pool | count}) -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {{- res.d | to_json -}}
+            {%- endif -%}
+
       - name: "Dynamic Next Day Manual Period"
         unique_id: dynamic_next_day_manual_period
         icon: mdi:calendar-arrow-right

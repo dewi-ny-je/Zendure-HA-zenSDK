@@ -2971,10 +2971,17 @@ views:
               discharge power.
 
 
+              Both sweeps use the same selection rules as the period planning,
+              so **Z** windows restrict which periods are considered (including
+              a window running past midnight into tomorrow's prices) and
+              **+**/**-** overrides are applied before the average is measured.
+              The power follows the number of periods that actually results.
+              When a window is too small to hold the minimum count, that side is
+              left on its maximum power.
+
+
               Pinning the day with absolute manual periods (**G14:00** style)
-              takes precedence and skips both optimisations; carried-over
-              periods and **+**/**-** overrides do not, since those still leave
-              the period counts in charge.
+              takes precedence and skips both optimisations.
             visibility:
               - condition: state
                 entity: input_boolean.dashboard_setting_show_help

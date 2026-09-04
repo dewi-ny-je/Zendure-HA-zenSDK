@@ -2979,10 +2979,18 @@ views:
               maximale op- en ontlaadvermogen.
 
 
+              Beide berekeningen gebruiken dezelfde selectieregels als de
+              periodeplanning: **Z**-vensters bepalen welke periodes meetellen
+              (ook als een venster over middernacht doorloopt in de prijzen van
+              morgen) en **+**/**-**-correcties worden toegepast voordat het
+              gemiddelde wordt gemeten. Het vermogen volgt het aantal periodes
+              dat er daadwerkelijk uitkomt. Past het minimale aantal niet in het
+              venster, dan blijft die kant op het maximale vermogen.
+
+
               Zet je de dag vast met absolute handmatige periodes (stijl
               **G14:00**), dan gaat dat voor en worden beide optimalisaties
-              overgeslagen; overgedragen periodes en **+**/**-**-correcties
-              niet, want daarbij blijft het aantal periodes leidend.
+              overgeslagen.
             text_only: true
             visibility:
               - condition: state

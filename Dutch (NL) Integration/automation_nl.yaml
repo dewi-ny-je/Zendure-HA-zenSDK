@@ -1731,50 +1731,40 @@ actions:
                   {% set p = state_attr('sensor.dynamisch_goedkoopste_periode', 'raw_today') or [] %}
                   {{ p | count >= 11 and (p[0]['start'] | as_datetime | as_local).date() == now().date() }}
             then:
-              - alias: >-
-                  Vergroot de goedkoopste periodes van 11 tot 23 en houd het laatste aantal
-                  waarvan de gemiddelde prijs binnen 2% van het gemiddelde over de 11
-                  goedkoopste periodes blijft
+              - alias: Lees de periodes en het vermogen uit de venster-bewuste optimalisatiesensor
                 variables:
-                  optimal_periods: >-
-                    {% set prijzen = state_attr('sensor.dynamisch_goedkoopste_periode', 'raw_today') or [] %}
-                    {% set waarden = prijzen | map(attribute='value') | map('float') | sort | list %}
-                    {% set basis = (waarden[:11] | sum) / 11 %}
-                    {% set drempel = 0.02 * (basis | abs) %}
-                    {% set maxn = [23, waarden | count] | min %}
-                    {% set ns = namespace(gekozen=maxn, gevonden=false) %}
-                    {% for x in range(12, maxn + 1) %}
-                    {% if not ns.gevonden and ((waarden[:x] | sum) / x - basis) > drempel %}
-                    {% set ns.gekozen = x - 1 %}
-                    {% set ns.gevonden = true %}
-                    {% endif %}
-                    {% endfor %}
-                    {{ ns.gekozen }}
-              - alias: Oplaadvermogen via y = 6.3131x² - 341.16x + 6002.5, begrensd op het max. oplaadvermogen
-                variables:
-                  optimal_power: >-
-                    {% set x = optimal_periods | int %}
-                    {{ [ (6.3131 * x * x - 341.16 * x + 6002.5) | round(0) | int,
-                    states('input_number.zendure_2400_ac_max_oplaadvermogen') | int(12000) ] | min }}
-              - alias: Zet het geoptimaliseerde aantal goedkoopste periodes voor vandaag
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamisch_goedkoopste_x_periode
-                data:
-                  value: "{{ optimal_periods | int }}"
-              - alias: Zet het dynamische oplaadvermogen voor vandaag
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamisch_oplaadvermogen
-                data:
-                  value: "{{ optimal_power | int }}"
-              - action: logbook.log
-                data:
-                  message: >-
-                    ⚙️Dynamisch oplaadvermogen geoptimaliseerd naar {{ optimal_power | int }} watt
-                    over de {{ optimal_periods | int }} goedkoopste periodes —
-                  entity_id: input_select.zendure_2400_ac_modus_selecteren
-                  name: " "
+                  opt: >-
+                    {{ state_attr('sensor.dynamisch_vermogen_optimalisatie', 'optimisation') or {} }}
+              - alias: De venster-bewuste berekening leverde een resultaat voor de laadkant
+                if:
+                  - condition: template
+                    value_template: >-
+                      {{ 'G_periods' in opt }}
+                then:
+                  - alias: Zet het geoptimaliseerde aantal goedkoopste periodes voor vandaag
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamisch_goedkoopste_x_periode
+                    data:
+                      value: "{{ opt.G_periods | int }}"
+                  - alias: Zet het dynamische oplaadvermogen voor vandaag
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamisch_oplaadvermogen
+                    data:
+                      value: "{{ opt.G_power | int }}"
+                  - action: logbook.log
+                    data:
+                      message: >-
+                        ⚙️Dynamisch oplaadvermogen geoptimaliseerd naar {{ opt.G_power | int }} watt over de {{ opt.G_periods | int }} goedkoopste periodes ({{ opt.G_slots | int }} slots) —
+                      entity_id: input_select.zendure_2400_ac_modus_selecteren
+                      name: " "
+                else:
+                  - action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamisch_oplaadvermogen
+                    data:
+                      value: 0
             else:
               - alias: >-
                   Optimalisatie van het oplaadvermogen uit, dag vastgezet met absolute handmatige
@@ -1810,50 +1800,40 @@ actions:
                   {% set p = state_attr('sensor.dynamisch_goedkoopste_periode', 'raw_today') or [] %}
                   {{ p | count >= 11 and (p[0]['start'] | as_datetime | as_local).date() == now().date() }}
             then:
-              - alias: >-
-                  Vergroot de duurste periodes van 10 tot 21 en houd het laatste aantal waarvan
-                  de gemiddelde prijs binnen 2% van het gemiddelde over de 10 duurste
-                  periodes blijft
+              - alias: Lees de periodes en het vermogen uit de venster-bewuste optimalisatiesensor
                 variables:
-                  optimal_discharge_periods: >-
-                    {% set prijzen = state_attr('sensor.dynamisch_goedkoopste_periode', 'raw_today') or [] %}
-                    {% set waarden = prijzen | map(attribute='value') | map('float') | sort(reverse=true) | list %}
-                    {% set basis = (waarden[:10] | sum) / 10 %}
-                    {% set drempel = 0.02 * (basis | abs) %}
-                    {% set maxn = [21, waarden | count] | min %}
-                    {% set ns = namespace(gekozen=maxn, gevonden=false) %}
-                    {% for x in range(11, maxn + 1) %}
-                    {% if not ns.gevonden and (basis - (waarden[:x] | sum) / x) > drempel %}
-                    {% set ns.gekozen = x - 1 %}
-                    {% set ns.gevonden = true %}
-                    {% endif %}
-                    {% endfor %}
-                    {{ ns.gekozen }}
-              - alias: Ontlaadvermogen via y = 25569x^-0.935, begrensd op het max. ontlaadvermogen
-                variables:
-                  optimal_discharge_power: >-
-                    {% set x = optimal_discharge_periods | int %}
-                    {{ [ (25569 * (x ** -0.935)) | round(0) | int,
-                    states('input_number.zendure_2400_ac_max_ontlaadvermogen') | int(12000) ] | min }}
-              - alias: Zet het geoptimaliseerde aantal duurste periodes voor vandaag
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamisch_duurste_x_periode
-                data:
-                  value: "{{ optimal_discharge_periods | int }}"
-              - alias: Zet het dynamische ontlaadvermogen voor vandaag
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamisch_ontlaadvermogen
-                data:
-                  value: "{{ optimal_discharge_power | int }}"
-              - action: logbook.log
-                data:
-                  message: >-
-                    ⚙️Dynamisch ontlaadvermogen geoptimaliseerd naar {{ optimal_discharge_power | int }}
-                    watt over de {{ optimal_discharge_periods | int }} duurste periodes —
-                  entity_id: input_select.zendure_2400_ac_modus_selecteren
-                  name: " "
+                  opt: >-
+                    {{ state_attr('sensor.dynamisch_vermogen_optimalisatie', 'optimisation') or {} }}
+              - alias: De venster-bewuste berekening leverde een resultaat voor de ontlaadkant
+                if:
+                  - condition: template
+                    value_template: >-
+                      {{ 'D_periods' in opt }}
+                then:
+                  - alias: Zet het geoptimaliseerde aantal duurste periodes voor vandaag
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamisch_duurste_x_periode
+                    data:
+                      value: "{{ opt.D_periods | int }}"
+                  - alias: Zet het dynamische ontlaadvermogen voor vandaag
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamisch_ontlaadvermogen
+                    data:
+                      value: "{{ opt.D_power | int }}"
+                  - action: logbook.log
+                    data:
+                      message: >-
+                        ⚙️Dynamisch ontlaadvermogen geoptimaliseerd naar {{ opt.D_power | int }} watt over de {{ opt.D_periods | int }} duurste periodes ({{ opt.D_slots | int }} slots) —
+                      entity_id: input_select.zendure_2400_ac_modus_selecteren
+                      name: " "
+                else:
+                  - action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamisch_ontlaadvermogen
+                    data:
+                      value: 0
             else:
               - alias: >-
                   Optimalisatie van het ontlaadvermogen uit, dag vastgezet met absolute handmatige

@@ -1709,49 +1709,40 @@ actions:
                   {% set p = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
                   {{ p | count >= 11 and (p[0]['start'] | as_datetime | as_local).date() == now().date() }}
             then:
-              - alias: >-
-                  Widen the cheapest periods from 11 up to 23 and keep the last count whose
-                  average price stays within 2% of the average over the 11 cheapest periods
+              - alias: Read the periods and power from the window-aware optimisation sensor
                 variables:
-                  optimal_periods: >-
-                    {% set prijzen = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
-                    {% set waarden = prijzen | map(attribute='value') | map('float') | sort | list %}
-                    {% set basis = (waarden[:11] | sum) / 11 %}
-                    {% set drempel = 0.02 * (basis | abs) %}
-                    {% set maxn = [23, waarden | count] | min %}
-                    {% set ns = namespace(gekozen=maxn, gevonden=false) %}
-                    {% for x in range(12, maxn + 1) %}
-                    {% if not ns.gevonden and ((waarden[:x] | sum) / x - basis) > drempel %}
-                    {% set ns.gekozen = x - 1 %}
-                    {% set ns.gevonden = true %}
-                    {% endif %}
-                    {% endfor %}
-                    {{ ns.gekozen }}
-              - alias: Charge power from y = 6.3131x² - 341.16x + 6002.5, capped at the maximum charge power
-                variables:
-                  optimal_power: >-
-                    {% set x = optimal_periods | int %}
-                    {{ [ (6.3131 * x * x - 341.16 * x + 6002.5) | round(0) | int,
-                    states('input_number.zendure_setting_max_charge_power') | int(12000) ] | min }}
-              - alias: Set the optimised number of cheapest periods for today
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamic_lowest_price_x_period
-                data:
-                  value: "{{ optimal_periods | int }}"
-              - alias: Set the dynamic charge power for today
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamic_charge_power
-                data:
-                  value: "{{ optimal_power | int }}"
-              - action: logbook.log
-                data:
-                  message: >-
-                    ⚙️Dynamic charge power optimised to {{ optimal_power | int }} watt over the
-                    {{ optimal_periods | int }} cheapest periods —
-                  entity_id: input_select.zendure_operation_mode
-                  name: " "
+                  opt: >-
+                    {{ state_attr('sensor.dynamic_power_optimisation', 'optimisation') or {} }}
+              - alias: The window-aware sweep produced a result for the charge side
+                if:
+                  - condition: template
+                    value_template: >-
+                      {{ 'G_periods' in opt }}
+                then:
+                  - alias: Set the optimised number of cheapest periods for today
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamic_lowest_price_x_period
+                    data:
+                      value: "{{ opt.G_periods | int }}"
+                  - alias: Set the dynamic charge power for today
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamic_charge_power
+                    data:
+                      value: "{{ opt.G_power | int }}"
+                  - action: logbook.log
+                    data:
+                      message: >-
+                        ⚙️Dynamic charge power optimised to {{ opt.G_power | int }} watt over the {{ opt.G_periods | int }} cheapest periods ({{ opt.G_slots | int }} slots) —
+                      entity_id: input_select.zendure_operation_mode
+                      name: " "
+                else:
+                  - action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamic_charge_power
+                    data:
+                      value: 0
             else:
               - alias: >-
                   Charge power optimisation off, day pinned with absolute manual periods, or no
@@ -1787,49 +1778,40 @@ actions:
                   {% set p = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
                   {{ p | count >= 11 and (p[0]['start'] | as_datetime | as_local).date() == now().date() }}
             then:
-              - alias: >-
-                  Widen the most expensive periods from 10 up to 21 and keep the last count whose
-                  average price stays within 2% of the average over the 10 most expensive periods
+              - alias: Read the periods and power from the window-aware optimisation sensor
                 variables:
-                  optimal_discharge_periods: >-
-                    {% set prijzen = state_attr('sensor.dynamic_lowest_price_period', 'raw_today') or [] %}
-                    {% set waarden = prijzen | map(attribute='value') | map('float') | sort(reverse=true) | list %}
-                    {% set basis = (waarden[:10] | sum) / 10 %}
-                    {% set drempel = 0.02 * (basis | abs) %}
-                    {% set maxn = [21, waarden | count] | min %}
-                    {% set ns = namespace(gekozen=maxn, gevonden=false) %}
-                    {% for x in range(11, maxn + 1) %}
-                    {% if not ns.gevonden and (basis - (waarden[:x] | sum) / x) > drempel %}
-                    {% set ns.gekozen = x - 1 %}
-                    {% set ns.gevonden = true %}
-                    {% endif %}
-                    {% endfor %}
-                    {{ ns.gekozen }}
-              - alias: Discharge power from y = 25569x^-0.935, capped at the maximum discharge power
-                variables:
-                  optimal_discharge_power: >-
-                    {% set x = optimal_discharge_periods | int %}
-                    {{ [ (25569 * (x ** -0.935)) | round(0) | int,
-                    states('input_number.zendure_setting_max_discharge_power') | int(12000) ] | min }}
-              - alias: Set the optimised number of most expensive periods for today
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamic_highest_price_x_period
-                data:
-                  value: "{{ optimal_discharge_periods | int }}"
-              - alias: Set the dynamic discharge power for today
-                action: input_number.set_value
-                target:
-                  entity_id: input_number.dynamic_discharge_power
-                data:
-                  value: "{{ optimal_discharge_power | int }}"
-              - action: logbook.log
-                data:
-                  message: >-
-                    ⚙️Dynamic discharge power optimised to {{ optimal_discharge_power | int }} watt over
-                    the {{ optimal_discharge_periods | int }} most expensive periods —
-                  entity_id: input_select.zendure_operation_mode
-                  name: " "
+                  opt: >-
+                    {{ state_attr('sensor.dynamic_power_optimisation', 'optimisation') or {} }}
+              - alias: The window-aware sweep produced a result for the discharge side
+                if:
+                  - condition: template
+                    value_template: >-
+                      {{ 'D_periods' in opt }}
+                then:
+                  - alias: Set the optimised number of most expensive periods for today
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamic_highest_price_x_period
+                    data:
+                      value: "{{ opt.D_periods | int }}"
+                  - alias: Set the dynamic discharge power for today
+                    action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamic_discharge_power
+                    data:
+                      value: "{{ opt.D_power | int }}"
+                  - action: logbook.log
+                    data:
+                      message: >-
+                        ⚙️Dynamic discharge power optimised to {{ opt.D_power | int }} watt over the {{ opt.D_periods | int }} most expensive periods ({{ opt.D_slots | int }} slots) —
+                      entity_id: input_select.zendure_operation_mode
+                      name: " "
+                else:
+                  - action: input_number.set_value
+                    target:
+                      entity_id: input_number.dynamic_discharge_power
+                    data:
+                      value: 0
             else:
               - alias: >-
                   Discharge power optimisation off, day pinned with absolute manual periods, or no
