@@ -415,14 +415,16 @@ template:
       - name: "Zendure-HA-Zensdk Github Releasecheck"
         unique_id: zendure_ha_zensdk_github_releasecheck
         state: >
-          {% set config_date = states('sensor.zendure_2400_ac_configuratie_versie')
-            | regex_findall('v(\d{8})') | first %}
-          {% set github_raw = state_attr('sensor.github_zendure_ha_zensdk_gielz1986', 'tag_name') %}
-          {% if github_raw in ['unknown', 'unavailable', None] %}
-          {% set github_date = None %}
-          {% else %}
-          {% set github_date = github_raw | regex_replace('v','') %}
-          {% endif %}
+          {#- Both source sensors can be unknown/unavailable (at startup, or
+              while the GitHub REST poll has not succeeded yet). Index the
+              regex result instead of using `| first`, which logs
+              "No first item, sequence was empty" on an empty list. -#}
+          {% set config_match = states('sensor.zendure_2400_ac_configuratie_versie')
+            | regex_findall('v(\d{8})') %}
+          {% set config_date = config_match[0] if config_match else None %}
+          {% set github_match = state_attr('sensor.github_zendure_ha_zensdk_gielz1986', 'tag_name')
+            | string | regex_findall('(\d{8})') %}
+          {% set github_date = github_match[0] if github_match else None %}
           {% if config_date and github_date %}
           {% if config_date > github_date %}
             Pre-release actief
