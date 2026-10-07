@@ -1461,7 +1461,7 @@ actions:
               - condition: state
                 entity_id: input_boolean.zendure_2400_ac_soc_bescherming_uitgeschakeld
                 state:
-                  - "on"
+                  - 'on'
               - condition: template
                 value_template: |
                   {{ states('sensor.zendure_2400_ac_laadpercentage') | float(0) >=
@@ -1475,11 +1475,11 @@ actions:
               - condition: state
                 entity_id: input_boolean.dynamisch_laden_loopt
                 state:
-                  - "off"
+                  - 'off'
               - condition: state
                 entity_id: input_boolean.dynamisch_ontladen_loopt
                 state:
-                  - "off"
+                  - 'off'
           - alias: Benodigde sensoren zijn beschikbaar
             condition: template
             value_template: >-
@@ -1490,14 +1490,14 @@ actions:
         sequence:
           - action: rest_command.zendure_stop_met_ontladen
             data:
-              sn: "{{ states('sensor.zendure_2400_ac_serienummer') }}"
+              sn: '{{ states(''sensor.zendure_2400_ac_serienummer'') }}'
           - action: logbook.log
             data:
               message: >-
                 🛑Minimale laadpercentage bereikt — ontlaadvermogen teruggezet
                 naar 0 watt —
               entity_id: input_select.zendure_2400_ac_modus_selecteren
-              name: " "
+              name: ' '
         alias: Stop met ontladen wanneer het minimale laadpercentage is bereikt
   - alias: Handmatige Aansturing
     choose:

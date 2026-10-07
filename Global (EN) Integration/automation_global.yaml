@@ -1441,7 +1441,7 @@ actions:
               - condition: state
                 entity_id: input_boolean.zendure_setting_soc_protection_disabled
                 state:
-                  - "on"
+                  - 'on'
               - condition: template
                 value_template: |
                   {{ states('sensor.zendure_total_state_of_charge') | float(0) >=
@@ -1455,11 +1455,11 @@ actions:
               - condition: state
                 entity_id: input_boolean.dynamic_charging_running
                 state:
-                  - "off"
+                  - 'off'
               - condition: state
                 entity_id: input_boolean.dynamic_discharging_running
                 state:
-                  - "off"
+                  - 'off'
           - alias: Required sensors are available
             condition: template
             value_template: >-
@@ -1470,14 +1470,14 @@ actions:
         sequence:
           - action: rest_command.zendure_stop_with_discharging
             data:
-              sn: "{{ states('sensor.zendure_serial_number') }}"
+              sn: '{{ states(''sensor.zendure_serial_number'') }}'
           - action: logbook.log
             data:
               message: >-
                 🛑Minimum state of charge reached — discharge power reset to 0
                 watt —
               entity_id: input_select.zendure_operation_mode
-              name: " "
+              name: ' '
         alias: Stop discharging when the minimum state of charge is reached
   - alias: Manual Control
     choose:
