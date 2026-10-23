@@ -1805,6 +1805,8 @@ views:
                     name: Batterij 1 Laadpercentage
                   - entity: sensor.zendure_2400_ac_batterij_1_celbalans_status
                     name: Batterij 1 Celbalans
+                  - entity: sensor.zendure_2400_ac_batterij_1_celspanning_verschil
+                    name: Batterij 1 Celspanning Verschil
                 visibility:
                   - condition: state
                     entity: sensor.zendure_2400_ac_aantal_batterijen
@@ -1824,6 +1826,10 @@ views:
                     name: Batterij 1 Celbalans
                   - entity: sensor.zendure_2400_ac_batterij_2_celbalans_status
                     name: Batterij 2 Celbalans
+                  - entity: sensor.zendure_2400_ac_batterij_1_celspanning_verschil
+                    name: Batterij 1 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_2_celspanning_verschil
+                    name: Batterij 2 Celspanning Verschil
                 visibility:
                   - condition: state
                     entity: sensor.zendure_2400_ac_aantal_batterijen
@@ -1849,6 +1855,12 @@ views:
                     name: Batterij 2 Celbalans
                   - entity: sensor.zendure_2400_ac_batterij_3_celbalans_status
                     name: Batterij 3 Celbalans
+                  - entity: sensor.zendure_2400_ac_batterij_1_celspanning_verschil
+                    name: Batterij 1 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_2_celspanning_verschil
+                    name: Batterij 2 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_3_celspanning_verschil
+                    name: Batterij 3 Celspanning Verschil
                 visibility:
                   - condition: state
                     entity: sensor.zendure_2400_ac_aantal_batterijen
@@ -1880,6 +1892,14 @@ views:
                     name: Batterij 3 Celbalans
                   - entity: sensor.zendure_2400_ac_batterij_4_celbalans_status
                     name: Batterij 4 Celbalans
+                  - entity: sensor.zendure_2400_ac_batterij_1_celspanning_verschil
+                    name: Batterij 1 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_2_celspanning_verschil
+                    name: Batterij 2 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_3_celspanning_verschil
+                    name: Batterij 3 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_4_celspanning_verschil
+                    name: Batterij 4 Celspanning Verschil
                 visibility:
                   - condition: state
                     entity: sensor.zendure_2400_ac_aantal_batterijen
@@ -1917,6 +1937,16 @@ views:
                     name: Batterij 4 Celbalans
                   - entity: sensor.zendure_2400_ac_batterij_5_celbalans_status
                     name: Batterij 5 Celbalans
+                  - entity: sensor.zendure_2400_ac_batterij_1_celspanning_verschil
+                    name: Batterij 1 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_2_celspanning_verschil
+                    name: Batterij 2 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_3_celspanning_verschil
+                    name: Batterij 3 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_4_celspanning_verschil
+                    name: Batterij 4 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_5_celspanning_verschil
+                    name: Batterij 5 Celspanning Verschil
                 visibility:
                   - condition: state
                     entity: sensor.zendure_2400_ac_aantal_batterijen
@@ -1960,6 +1990,18 @@ views:
                     name: Batterij 5 Celbalans
                   - entity: sensor.zendure_2400_ac_batterij_6_celbalans_status
                     name: Batterij 6 Celbalans
+                  - entity: sensor.zendure_2400_ac_batterij_1_celspanning_verschil
+                    name: Batterij 1 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_2_celspanning_verschil
+                    name: Batterij 2 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_3_celspanning_verschil
+                    name: Batterij 3 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_4_celspanning_verschil
+                    name: Batterij 4 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_5_celspanning_verschil
+                    name: Batterij 5 Celspanning Verschil
+                  - entity: sensor.zendure_2400_ac_batterij_6_celspanning_verschil
+                    name: Batterij 6 Celspanning Verschil
                 visibility:
                   - condition: numeric_state
                     entity: sensor.zendure_2400_ac_aantal_batterijen

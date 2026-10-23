@@ -1800,6 +1800,8 @@ views:
                     name: Battery 1 State Of Charge
                   - entity: sensor.zendure_battery_1_cell_balance_status
                     name: Battery 1 Cell Balance
+                  - entity: sensor.zendure_battery_1_cell_voltage_delta
+                    name: Battery 1 Cell Voltage Delta
                 visibility:
                   - condition: state
                     entity: sensor.zendure_total_batteries
@@ -1819,6 +1821,10 @@ views:
                     name: Battery 1 Cell Balance
                   - entity: sensor.zendure_battery_2_cell_balance_status
                     name: Battery 2 Cell Balance
+                  - entity: sensor.zendure_battery_1_cell_voltage_delta
+                    name: Battery 1 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_2_cell_voltage_delta
+                    name: Battery 2 Cell Voltage Delta
                 visibility:
                   - condition: state
                     entity: sensor.zendure_total_batteries
@@ -1844,6 +1850,12 @@ views:
                     name: Battery 2 Cell Balance
                   - entity: sensor.zendure_battery_3_cell_balance_status
                     name: Battery 3 Cell Balance
+                  - entity: sensor.zendure_battery_1_cell_voltage_delta
+                    name: Battery 1 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_2_cell_voltage_delta
+                    name: Battery 2 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_3_cell_voltage_delta
+                    name: Battery 3 Cell Voltage Delta
                 visibility:
                   - condition: state
                     entity: sensor.zendure_total_batteries
@@ -1875,6 +1887,14 @@ views:
                     name: Battery 3 Cell Balance
                   - entity: sensor.zendure_battery_4_cell_balance_status
                     name: Battery 4 Cell Balance
+                  - entity: sensor.zendure_battery_1_cell_voltage_delta
+                    name: Battery 1 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_2_cell_voltage_delta
+                    name: Battery 2 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_3_cell_voltage_delta
+                    name: Battery 3 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_4_cell_voltage_delta
+                    name: Battery 4 Cell Voltage Delta
                 visibility:
                   - condition: state
                     entity: sensor.zendure_total_batteries
@@ -1912,6 +1932,16 @@ views:
                     name: Battery 4 Cell Balance
                   - entity: sensor.zendure_battery_5_cell_balance_status
                     name: Battery 5 Cell Balance
+                  - entity: sensor.zendure_battery_1_cell_voltage_delta
+                    name: Battery 1 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_2_cell_voltage_delta
+                    name: Battery 2 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_3_cell_voltage_delta
+                    name: Battery 3 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_4_cell_voltage_delta
+                    name: Battery 4 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_5_cell_voltage_delta
+                    name: Battery 5 Cell Voltage Delta
                 visibility:
                   - condition: state
                     entity: sensor.zendure_total_batteries
@@ -1955,6 +1985,18 @@ views:
                     name: Battery 5 Cell Balance
                   - entity: sensor.zendure_battery_6_cell_balance_status
                     name: Battery 6 Cell Balance
+                  - entity: sensor.zendure_battery_1_cell_voltage_delta
+                    name: Battery 1 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_2_cell_voltage_delta
+                    name: Battery 2 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_3_cell_voltage_delta
+                    name: Battery 3 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_4_cell_voltage_delta
+                    name: Battery 4 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_5_cell_voltage_delta
+                    name: Battery 5 Cell Voltage Delta
+                  - entity: sensor.zendure_battery_6_cell_voltage_delta
+                    name: Battery 6 Cell Voltage Delta
                 visibility:
                   - condition: numeric_state
                     entity: sensor.zendure_total_batteries
