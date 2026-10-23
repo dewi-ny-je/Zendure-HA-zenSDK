@@ -1574,7 +1574,21 @@ rest:
         unit_of_measurement: "mV"
         device_class: voltage
         state_class: measurement
-        availability: "{{ states('sensor.zendure_battery_packs_detected') | int(0) >= 1 }}"
+        availability: >
+          {% set count_ok = states('sensor.zendure_battery_packs_detected') | int(0) >= 1 %}
+          {% if value_json is not defined or value_json is not mapping %}
+            {{ count_ok }}
+          {% else %}
+            {% set packdata = value_json.get('packData', []) %}
+            {% set volgorde_raw = states('input_text.zendure_setting_battery_order') %}
+            {% set volgorde = volgorde_raw.split(';') if volgorde_raw not in ['unknown', 'unavailable', ''] else [] %}
+            {% set unique = volgorde | length <= 0 or volgorde | select('eq', volgorde[0]) | list | count == 1 %}
+            {% set idx = (volgorde[0] | int(0)) - 1 if volgorde | length > 0 else 0 %}
+            {% set p = packdata[idx] if idx >= 0 and idx < packdata | length and packdata[idx] is mapping else {} %}
+            {% set vmax = p.get('maxVol') %}
+            {% set vmin = p.get('minVol') %}
+            {{ count_ok and unique and vmax is number and vmin is number and vmin > 0 and vmax >= vmin }}
+          {% endif %}
         value_template: >
           {% set packdata = value_json.get('packData', []) %}
           {% set volgorde_raw = states('input_text.zendure_setting_battery_order') %}
@@ -1613,7 +1627,21 @@ rest:
         unit_of_measurement: "mV"
         device_class: voltage
         state_class: measurement
-        availability: "{{ states('sensor.zendure_battery_packs_detected') | int(0) >= 2 }}"
+        availability: >
+          {% set count_ok = states('sensor.zendure_battery_packs_detected') | int(0) >= 2 %}
+          {% if value_json is not defined or value_json is not mapping %}
+            {{ count_ok }}
+          {% else %}
+            {% set packdata = value_json.get('packData', []) %}
+            {% set volgorde_raw = states('input_text.zendure_setting_battery_order') %}
+            {% set volgorde = volgorde_raw.split(';') if volgorde_raw not in ['unknown', 'unavailable', ''] else [] %}
+            {% set unique = volgorde | length <= 1 or volgorde | select('eq', volgorde[1]) | list | count == 1 %}
+            {% set idx = (volgorde[1] | int(0)) - 1 if volgorde | length > 1 else 1 %}
+            {% set p = packdata[idx] if idx >= 0 and idx < packdata | length and packdata[idx] is mapping else {} %}
+            {% set vmax = p.get('maxVol') %}
+            {% set vmin = p.get('minVol') %}
+            {{ count_ok and unique and vmax is number and vmin is number and vmin > 0 and vmax >= vmin }}
+          {% endif %}
         value_template: >
           {% set packdata = value_json.get('packData', []) %}
           {% set volgorde_raw = states('input_text.zendure_setting_battery_order') %}
@@ -1652,7 +1680,21 @@ rest:
         unit_of_measurement: "mV"
         device_class: voltage
         state_class: measurement
-        availability: "{{ states('sensor.zendure_battery_packs_detected') | int(0) >= 3 }}"
+        availability: >
+          {% set count_ok = states('sensor.zendure_battery_packs_detected') | int(0) >= 3 %}
+          {% if value_json is not defined or value_json is not mapping %}
+            {{ count_ok }}
+          {% else %}
+            {% set packdata = value_json.get('packData', []) %}
+            {% set volgorde_raw = states('input_text.zendure_setting_battery_order') %}
+            {% set volgorde = volgorde_raw.split(';') if volgorde_raw not in ['unknown', 'unavailable', ''] else [] %}
+            {% set unique = volgorde | length <= 2 or volgorde | select('eq', volgorde[2]) | list | count == 1 %}
+            {% set idx = (volgorde[2] | int(0)) - 1 if volgorde | length > 2 else 2 %}
+            {% set p = packdata[idx] if idx >= 0 and idx < packdata | length and packdata[idx] is mapping else {} %}
+            {% set vmax = p.get('maxVol') %}
+            {% set vmin = p.get('minVol') %}
+            {{ count_ok and unique and vmax is number and vmin is number and vmin > 0 and vmax >= vmin }}
+          {% endif %}
         value_template: >
           {% set packdata = value_json.get('packData', []) %}
           {% set volgorde_raw = states('input_text.zendure_setting_battery_order') %}
@@ -1691,7 +1733,21 @@ rest:
         unit_of_measurement: "mV"
         device_class: voltage
         state_class: measurement
-        availability: "{{ states('sensor.zendure_battery_packs_detected') | int(0) >= 4 }}"
+        availability: >
+          {% set count_ok = states('sensor.zendure_battery_packs_detected') | int(0) >= 4 %}
+          {% if value_json is not defined or value_json is not mapping %}
+            {{ count_ok }}
+          {% else %}
+            {% set packdata = value_json.get('packData', []) %}
+            {% set volgorde_raw = states('input_text.zendure_setting_battery_order') %}
+            {% set volgorde = volgorde_raw.split(';') if volgorde_raw not in ['unknown', 'unavailable', ''] else [] %}
+            {% set unique = volgorde | length <= 3 or volgorde | select('eq', volgorde[3]) | list | count == 1 %}
+            {% set idx = (volgorde[3] | int(0)) - 1 if volgorde | length > 3 else 3 %}
+            {% set p = packdata[idx] if idx >= 0 and idx < packdata | length and packdata[idx] is mapping else {} %}
+            {% set vmax = p.get('maxVol') %}
+            {% set vmin = p.get('minVol') %}
+            {{ count_ok and unique and vmax is number and vmin is number and vmin > 0 and vmax >= vmin }}
+          {% endif %}
         value_template: >
           {% set packdata = value_json.get('packData', []) %}
           {% set volgorde_raw = states('input_text.zendure_setting_battery_order') %}
@@ -1730,7 +1786,21 @@ rest:
         unit_of_measurement: "mV"
         device_class: voltage
         state_class: measurement
-        availability: "{{ states('sensor.zendure_battery_packs_detected') | int(0) >= 5 }}"
+        availability: >
+          {% set count_ok = states('sensor.zendure_battery_packs_detected') | int(0) >= 5 %}
+          {% if value_json is not defined or value_json is not mapping %}
+            {{ count_ok }}
+          {% else %}
+            {% set packdata = value_json.get('packData', []) %}
+            {% set volgorde_raw = states('input_text.zendure_setting_battery_order') %}
+            {% set volgorde = volgorde_raw.split(';') if volgorde_raw not in ['unknown', 'unavailable', ''] else [] %}
+            {% set unique = volgorde | length <= 4 or volgorde | select('eq', volgorde[4]) | list | count == 1 %}
+            {% set idx = (volgorde[4] | int(0)) - 1 if volgorde | length > 4 else 4 %}
+            {% set p = packdata[idx] if idx >= 0 and idx < packdata | length and packdata[idx] is mapping else {} %}
+            {% set vmax = p.get('maxVol') %}
+            {% set vmin = p.get('minVol') %}
+            {{ count_ok and unique and vmax is number and vmin is number and vmin > 0 and vmax >= vmin }}
+          {% endif %}
         value_template: >
           {% set packdata = value_json.get('packData', []) %}
           {% set volgorde_raw = states('input_text.zendure_setting_battery_order') %}
@@ -1769,7 +1839,21 @@ rest:
         unit_of_measurement: "mV"
         device_class: voltage
         state_class: measurement
-        availability: "{{ states('sensor.zendure_battery_packs_detected') | int(0) >= 6 }}"
+        availability: >
+          {% set count_ok = states('sensor.zendure_battery_packs_detected') | int(0) >= 6 %}
+          {% if value_json is not defined or value_json is not mapping %}
+            {{ count_ok }}
+          {% else %}
+            {% set packdata = value_json.get('packData', []) %}
+            {% set volgorde_raw = states('input_text.zendure_setting_battery_order') %}
+            {% set volgorde = volgorde_raw.split(';') if volgorde_raw not in ['unknown', 'unavailable', ''] else [] %}
+            {% set unique = volgorde | length <= 5 or volgorde | select('eq', volgorde[5]) | list | count == 1 %}
+            {% set idx = (volgorde[5] | int(0)) - 1 if volgorde | length > 5 else 5 %}
+            {% set p = packdata[idx] if idx >= 0 and idx < packdata | length and packdata[idx] is mapping else {} %}
+            {% set vmax = p.get('maxVol') %}
+            {% set vmin = p.get('minVol') %}
+            {{ count_ok and unique and vmax is number and vmin is number and vmin > 0 and vmax >= vmin }}
+          {% endif %}
         value_template: >
           {% set packdata = value_json.get('packData', []) %}
           {% set volgorde_raw = states('input_text.zendure_setting_battery_order') %}
