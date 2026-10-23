@@ -1566,6 +1566,25 @@ rest:
             unknown
           {% endif %}
 
+      - name: "Zendure 2400 AC Batterij 1 Celspanning Verschil"
+        unique_id: zendure_2400_ac_batterij_1_celspanning_verschil
+        icon: mdi:battery-heart-variant
+        unit_of_measurement: "mV"
+        device_class: voltage
+        state_class: measurement
+        availability: "{{ states('sensor.zendure_2400_ac_gedetecteerde_batterijen') | int(0) >= 1 }}"
+        value_template: >
+          {% set packdata = value_json.get('packData', []) %}
+          {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
+          {% set volgorde = volgorde_raw.split(';') if volgorde_raw not in ['unknown', 'unavailable', ''] else [] %}
+          {% set idx = (volgorde[0] | int(0)) - 1 if volgorde | length > 0 else 0 %}
+          {% if idx >= 0 and idx < packdata | length %}
+            {% set p = packdata[idx] %}
+            {{ ((p.get('maxVol', 0) | int(0)) - (p.get('minVol', 0) | int(0))) * 10 }}
+          {% else %}
+            0
+          {% endif %}
+
       - name: "Zendure 2400 AC Batterij 2 Celbalans Status"
         unique_id: zendure_2400_ac_batterij_2_celbalans_status
         icon: mdi:battery-heart-variant
@@ -1584,6 +1603,25 @@ rest:
                'Onbalans' }}
           {% else %}
             unknown
+          {% endif %}
+
+      - name: "Zendure 2400 AC Batterij 2 Celspanning Verschil"
+        unique_id: zendure_2400_ac_batterij_2_celspanning_verschil
+        icon: mdi:battery-heart-variant
+        unit_of_measurement: "mV"
+        device_class: voltage
+        state_class: measurement
+        availability: "{{ states('sensor.zendure_2400_ac_gedetecteerde_batterijen') | int(0) >= 2 }}"
+        value_template: >
+          {% set packdata = value_json.get('packData', []) %}
+          {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
+          {% set volgorde = volgorde_raw.split(';') if volgorde_raw not in ['unknown', 'unavailable', ''] else [] %}
+          {% set idx = (volgorde[1] | int(0)) - 1 if volgorde | length > 1 else 1 %}
+          {% if idx >= 0 and idx < packdata | length %}
+            {% set p = packdata[idx] %}
+            {{ ((p.get('maxVol', 0) | int(0)) - (p.get('minVol', 0) | int(0))) * 10 }}
+          {% else %}
+            0
           {% endif %}
 
       - name: "Zendure 2400 AC Batterij 3 Celbalans Status"
@@ -1606,6 +1644,25 @@ rest:
             unknown
           {% endif %}
 
+      - name: "Zendure 2400 AC Batterij 3 Celspanning Verschil"
+        unique_id: zendure_2400_ac_batterij_3_celspanning_verschil
+        icon: mdi:battery-heart-variant
+        unit_of_measurement: "mV"
+        device_class: voltage
+        state_class: measurement
+        availability: "{{ states('sensor.zendure_2400_ac_gedetecteerde_batterijen') | int(0) >= 3 }}"
+        value_template: >
+          {% set packdata = value_json.get('packData', []) %}
+          {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
+          {% set volgorde = volgorde_raw.split(';') if volgorde_raw not in ['unknown', 'unavailable', ''] else [] %}
+          {% set idx = (volgorde[2] | int(0)) - 1 if volgorde | length > 2 else 2 %}
+          {% if idx >= 0 and idx < packdata | length %}
+            {% set p = packdata[idx] %}
+            {{ ((p.get('maxVol', 0) | int(0)) - (p.get('minVol', 0) | int(0))) * 10 }}
+          {% else %}
+            0
+          {% endif %}
+
       - name: "Zendure 2400 AC Batterij 4 Celbalans Status"
         unique_id: zendure_2400_ac_batterij_4_celbalans_status
         icon: mdi:battery-heart-variant
@@ -1624,6 +1681,25 @@ rest:
                'Onbalans' }}
           {% else %}
             unknown
+          {% endif %}
+
+      - name: "Zendure 2400 AC Batterij 4 Celspanning Verschil"
+        unique_id: zendure_2400_ac_batterij_4_celspanning_verschil
+        icon: mdi:battery-heart-variant
+        unit_of_measurement: "mV"
+        device_class: voltage
+        state_class: measurement
+        availability: "{{ states('sensor.zendure_2400_ac_gedetecteerde_batterijen') | int(0) >= 4 }}"
+        value_template: >
+          {% set packdata = value_json.get('packData', []) %}
+          {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
+          {% set volgorde = volgorde_raw.split(';') if volgorde_raw not in ['unknown', 'unavailable', ''] else [] %}
+          {% set idx = (volgorde[3] | int(0)) - 1 if volgorde | length > 3 else 3 %}
+          {% if idx >= 0 and idx < packdata | length %}
+            {% set p = packdata[idx] %}
+            {{ ((p.get('maxVol', 0) | int(0)) - (p.get('minVol', 0) | int(0))) * 10 }}
+          {% else %}
+            0
           {% endif %}
 
       - name: "Zendure 2400 AC Batterij 5 Celbalans Status"
@@ -1646,6 +1722,25 @@ rest:
             unknown
           {% endif %}
 
+      - name: "Zendure 2400 AC Batterij 5 Celspanning Verschil"
+        unique_id: zendure_2400_ac_batterij_5_celspanning_verschil
+        icon: mdi:battery-heart-variant
+        unit_of_measurement: "mV"
+        device_class: voltage
+        state_class: measurement
+        availability: "{{ states('sensor.zendure_2400_ac_gedetecteerde_batterijen') | int(0) >= 5 }}"
+        value_template: >
+          {% set packdata = value_json.get('packData', []) %}
+          {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
+          {% set volgorde = volgorde_raw.split(';') if volgorde_raw not in ['unknown', 'unavailable', ''] else [] %}
+          {% set idx = (volgorde[4] | int(0)) - 1 if volgorde | length > 4 else 4 %}
+          {% if idx >= 0 and idx < packdata | length %}
+            {% set p = packdata[idx] %}
+            {{ ((p.get('maxVol', 0) | int(0)) - (p.get('minVol', 0) | int(0))) * 10 }}
+          {% else %}
+            0
+          {% endif %}
+
       - name: "Zendure 2400 AC Batterij 6 Celbalans Status"
         unique_id: zendure_2400_ac_batterij_6_celbalans_status
         icon: mdi:battery-heart-variant
@@ -1664,6 +1759,25 @@ rest:
                'Onbalans' }}
           {% else %}
             unknown
+          {% endif %}
+
+      - name: "Zendure 2400 AC Batterij 6 Celspanning Verschil"
+        unique_id: zendure_2400_ac_batterij_6_celspanning_verschil
+        icon: mdi:battery-heart-variant
+        unit_of_measurement: "mV"
+        device_class: voltage
+        state_class: measurement
+        availability: "{{ states('sensor.zendure_2400_ac_gedetecteerde_batterijen') | int(0) >= 6 }}"
+        value_template: >
+          {% set packdata = value_json.get('packData', []) %}
+          {% set volgorde_raw = states('input_text.zendure_2400_ac_batterij_volgorde') %}
+          {% set volgorde = volgorde_raw.split(';') if volgorde_raw not in ['unknown', 'unavailable', ''] else [] %}
+          {% set idx = (volgorde[5] | int(0)) - 1 if volgorde | length > 5 else 5 %}
+          {% if idx >= 0 and idx < packdata | length %}
+            {% set p = packdata[idx] %}
+            {{ ((p.get('maxVol', 0) | int(0)) - (p.get('minVol', 0) | int(0))) * 10 }}
+          {% else %}
+            0
           {% endif %}
 
       - name: "Zendure 2400 AC PV Doorvoer"
