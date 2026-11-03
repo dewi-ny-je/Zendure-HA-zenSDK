@@ -1701,7 +1701,7 @@ views:
             graph_span: 1day
             span:
               start: day
-            stacked: true
+            stacked: false
             cache: false
             apex_config:
               markers:
