@@ -1714,6 +1714,10 @@ views:
                     borderColor: var(--accent-color)
                     strokeDashArray: 4
                     borderWidth: 2
+                  - 'y': 40
+                    borderColor: var(--accent-color)
+                    strokeDashArray: 8
+                    borderWidth: 2
               yaxis:
                 - decimalsInFloat: 0
                   min: 0
@@ -1740,6 +1744,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1790,6 +1796,31 @@ views:
                 show:
                   in_header: false
                   in_legend: false
+              - entity: sensor.zendure_2400_ac_batterij_1_temperatuur
+                name: Batterij temperatuur
+                stroke_width: 2
+                opacity: 0.2
+                curve: smooth
+                extend_to: now
+                statistics:
+                  period: 5minute
+                  type: max
+                  align: start
+                type: area
+                color: '#6495ed'
+                show:
+                  in_header: false
+                color_threshold:
+                  - value: 0
+                    opacity: 0.2
+                  - value: 20
+                    opacity: 0.35
+                  - value: 25
+                    opacity: 0.5
+                  - value: 30
+                    opacity: 0.65
+                  - value: 35
+                    opacity: 0.8
           - type: heading
             icon: ''
             heading: Per Batterij
