@@ -1877,7 +1877,7 @@ rest:
 
       - name: "Zendure 2400 AC Vermogen PV Naar Huis"
         value_template: >
-          {% set pv = value_json['properties']['pvStatus'] | int(0) %}
+          {% set pv = value_json.get('properties', {}).get('pvStatus', 0) | int(0) %}
           {% set solar = value_json['properties']['solarInputPower'] | float(0) %}
           {% set grid_off = value_json.get('properties', {}).get('gridOffPower', 0) | float(0) %}
           {% set pv_active = (pv == 1) or (solar > 0) or (grid_off < 0) %}
@@ -1891,7 +1891,7 @@ rest:
 
       - name: "Zendure 2400 AC Vermogen PV Totaal"
         value_template: >
-          {% set pv = value_json['properties']['pvStatus'] | int(0) %}
+          {% set pv = value_json.get('properties', {}).get('pvStatus', 0) | int(0) %}
           {% set solar = value_json['properties']['solarInputPower'] | float(0) %}
           {% set grid_off = value_json.get('properties', {}).get('gridOffPower', 0) | float(0) %}
           {% set pv_active = (pv == 1) or (solar > 0) or (grid_off < 0) %}
@@ -1903,7 +1903,7 @@ rest:
 
       - name: "Zendure 2400 AC Vermogen PV Naar Batterij"
         value_template: >
-          {% set pv = value_json['properties']['pvStatus'] | int(0) %}
+          {% set pv = value_json.get('properties', {}).get('pvStatus', 0) | int(0) %}
           {% set solar = value_json['properties']['solarInputPower'] | float(0) %}
           {% set grid_off = value_json.get('properties', {}).get('gridOffPower', 0) | float(0) %}
           {% set pv_active = (pv == 1) or (solar > 0) or (grid_off < 0) %}
@@ -2318,7 +2318,7 @@ rest:
 
       - name: "Zendure 2400 AC Vermogen Aansturing"
         value_template: >
-          {% set pv = value_json['properties']['pvStatus'] | int(0) %}
+          {% set pv = value_json.get('properties', {}).get('pvStatus', 0) | int(0) %}
           {% set solar = value_json['properties']['solarInputPower'] | float(0) %}
           {% set grid_off = value_json.get('properties', {}).get('gridOffPower', 0) | float(0) %}
           {% set pv_active = (pv == 1) or (solar > 0) or (grid_off < 0) %}
