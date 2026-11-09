@@ -197,8 +197,6 @@ views:
                   format: HH:mm
                   show: false
               xaxis:
-                tooltip:
-                  enabled: true
                 labels:
                   show: false
                   style:
@@ -378,8 +376,6 @@ views:
                   format: HH:mm
                   show: false
               xaxis:
-                tooltip:
-                  enabled: true
                 labels:
                   show: false
                   style:
@@ -530,8 +526,6 @@ views:
                   format: HH:mm:ss
                   show: false
               xaxis:
-                tooltip:
-                  enabled: true
                 labels:
                   show: false
                   style:
