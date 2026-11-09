@@ -74,6 +74,18 @@ views:
               - condition: state
                 entity: input_select.zendure_operation_mode
                 state: Manual
+          - type: entities
+            entities:
+              - entity: input_number.dynamic_charge_power
+                name: Charge Power
+                secondary_info: last-changed
+            visibility:
+              - condition: state
+                entity: input_select.zendure_operation_mode
+                state: Dynamic Trading
+              - condition: state
+                entity: input_boolean.dynamic_setting_charge_power_optimisation
+                state: 'on'
           - type: custom:apexcharts-card
             experimental:
               hidden_by_default: true
@@ -197,6 +209,8 @@ views:
                   format: HH:mm
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
@@ -376,6 +390,8 @@ views:
                   format: HH:mm
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
@@ -526,6 +542,8 @@ views:
                   format: HH:mm:ss
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
