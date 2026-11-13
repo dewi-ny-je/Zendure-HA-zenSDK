@@ -197,6 +197,8 @@ views:
                   format: HH:mm
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
@@ -376,6 +378,8 @@ views:
                   format: HH:mm
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
@@ -526,6 +530,8 @@ views:
                   format: HH:mm:ss
                   show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                   style:
@@ -932,6 +938,8 @@ views:
                 offsetX: 0
                 offsetY: 17
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1001,6 +1009,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1516,6 +1526,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1628,6 +1640,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -1706,17 +1720,17 @@ views:
               annotations:
                 yaxis:
                   - 'y': 55
-                    borderColor: var(--accent-color)
+                    borderColor: '#01a180'
                     strokeDashArray: 4
                     borderWidth: 2
                   - 'y': 40
-                    borderColor: var(--accent-color)
+                    borderColor: '#6495ed'
                     strokeDashArray: 8
                     borderWidth: 2
               yaxis:
                 - decimalsInFloat: 0
                   min: 0
-                  max: 80
+                  max: 60
                   tickAmount: 4
                   labels:
                     show: true
@@ -2095,6 +2109,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -2208,6 +2224,8 @@ views:
               legend:
                 show: false
               xaxis:
+                tooltip:
+                  enabled: true
                 labels:
                   show: false
                 axisTicks:
@@ -2427,6 +2445,8 @@ views:
                       format: dd-MM (HH:mm)
                       show: false
                   xaxis:
+                    tooltip:
+                      enabled: true
                     labels:
                       show: false
                       style:
@@ -2563,6 +2583,8 @@ views:
                   legend:
                     show: false
                   xaxis:
+                    tooltip:
+                      enabled: true
                     labels:
                       show: false
                     axisTicks:
